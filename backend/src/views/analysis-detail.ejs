@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Medicine Forecast</title>
+
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/analysis.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="layout">
+
+    <%- include('./partials/sidebar', { activePage: 'analysis', user: user }) %>
+
+    <div class="main">
+
+        <h2 id="medicineName">Medicine Analysis</h2>
+
+        <!-- Loading Indicator -->
+        <div id="loadingSection">
+            <p>
+                <i class="fa-solid fa-spinner fa-spin"></i>
+                Loading analysis...
+            </p>
+        </div>
+
+        <!-- Analysis Content -->
+        <div id="analysisContent" style="display:none;">
+
+            <div class="analysis-summary">
+
+                <div class="analysis-card">
+                    <p class="label">Current Stock</p>
+                    <p class="value" id="currentStock">-</p>
+                </div>
+
+                <div class="analysis-card">
+                    <p class="label">Today's Predicted Demand</p>
+                    <p class="value" id="todayDemand">-</p>
+                </div>
+
+                <div class="analysis-card">
+                    <p class="label">Safety Stock</p>
+                    <p class="value" id="safetyStock">-</p>
+                </div>
+
+                <div class="analysis-card highlight">
+                    <p class="label">Suggested Restock</p>
+                    <p class="value" id="suggestedRestock">-</p>
+                </div>
+
+            </div>
+
+            <!-- Forecast Chart -->
+            <div class="chart-container">
+
+                <h3>30 Day Demand Forecast</h3>
+
+                <canvas id="forecastChart"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- PASS MEDICINE ID FROM ROUTE -->
+<script>
+    const medicineId = "<%= medicineId || '' %>";
+</script>
+
+
+<!-- LOAD CHART LIBRARY FIRST -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- LOAD ANALYSIS LOGIC -->
+<script src="/js/analysis.js"></script>
+
+</body>
+</html>

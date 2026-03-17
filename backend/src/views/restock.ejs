@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Restock Medicine</title>
+
+<link rel="stylesheet" href="/css/layout.css">
+<link rel="stylesheet" href="/css/dashboard.css">
+<link rel="stylesheet" href="/css/restock.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="layout">
+
+<%- include('./partials/sidebar', { activePage: 'inventory', user: user }) %>
+
+<div class="main">
+
+<h2>Create Purchase Order</h2>
+
+<form id="orderForm">
+
+<label>Supplier</label>
+<select id="supplier_id"></select>
+
+<label>Quantity</label>
+<input type="number" id="quantity" required>
+
+<label>Unit Price</label>
+<input type="number" id="unit_price" step="0.01" required>
+
+<button type="submit">Place Order</button>
+
+</form>
+
+</div>
+
+</div>
+
+<script src="/js/restock.js"></script>
+
+</body>
+</html>

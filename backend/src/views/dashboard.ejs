@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Pharmacy Dashboard</title>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+
+    <!-- Icons -->
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Chart.js -->
+    <script src="/js/chart.js"></script>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <%- include('./partials/sidebar', { activePage: activePage, user: user }) %>
+
+    <!-- MAIN CONTENT -->
+    <div class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" placeholder="Search medicines, customers, reports...">
+            </div>
+        </div>
+
+        <!-- DASHBOARD CARDS -->
+        <div class="cards">
+            <div class="card">
+                <h4>Total Sales</h4>
+                <p>₹ <%= dashboard?.stats?.totalSales || 0 %></p>
+            </div>
+
+            <div class="card">
+                <h4>Net Profit</h4>
+                <p>₹ <%= dashboard?.stats?.netProfit || 0 %></p>
+            </div>
+
+            <div class="card">
+                <h4>Total Customers</h4>
+                <p><%= dashboard?.stats?.totalCustomers || 0 %></p>
+            </div>
+
+            <div class="card">
+                <h4>Expired Medicines</h4>
+                <p>0</p>
+            </div>
+        </div>
+
+        <!-- CHARTS SECTION -->
+        <div class="charts">
+
+            <!-- ATC PIE CHART -->
+            <div class="chart-box">
+                <h3>Sales Distribution (ATC)</h3>
+                <canvas id="pieChart"></canvas>
+            </div>
+
+            <!-- WEEKLY SALES BAR CHART -->
+            <div class="chart-box">
+                <h3>Weekly Sales</h3>
+                <canvas id="barChart"></canvas>
+            </div>
+
+        </div>
+
+    </div> <!-- END MAIN -->
+
+</div> <!-- END LAYOUT -->
+
+<div id="dashboardData"
+     data-dashboard='<%- JSON.stringify(dashboard) %>'>
+</div>
+<script src="/js/chart.js"></script>
+<script src="/js/dashboardCharts.js"></script>
+<script src="/js/alert.js"></script>
+</body>
+</html>

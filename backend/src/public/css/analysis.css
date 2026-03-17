@@ -1,0 +1,153 @@
+/* ================= MAIN ================= */
+
+.main{
+    padding:30px;
+}
+
+/* ================= TITLE ================= */
+
+.main h2{
+    color:#1e88e5;
+    margin-bottom:20px;
+}
+
+
+/* ================= SEARCH BAR ================= */
+
+.search-container{
+    margin-bottom:20px;
+}
+
+#medicineSearch{
+    padding:10px 12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    width:300px;
+    font-size:14px;
+}
+
+#medicineSearch:focus{
+    outline:none;
+    border-color:#1e88e5;
+}
+
+
+/* ================= ANALYSIS TABLE ================= */
+
+.analysis-table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 10px 25px rgba(0,0,0,0.06);
+}
+
+/* TABLE HEADER */
+
+.analysis-table thead{
+    background:#1e88e5;
+}
+
+.analysis-table thead th{
+    color:white;
+    padding:14px 16px;
+    text-align:left;
+}
+
+/* TABLE BODY */
+
+.analysis-table td{
+    padding:12px 14px;
+    border-bottom:1px solid #eee;
+}
+
+.analysis-table tr:nth-child(even){
+    background:#f9fbff;
+}
+
+.analysis-table tr:hover{
+    background:#e3f2fd;
+}
+
+
+/* ================= ANALYZE BUTTON ================= */
+
+.analysis-table button{
+    background:#1e88e5;
+    color:white;
+    border:none;
+    padding:6px 12px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.analysis-table button:hover{
+    background:#1565c0;
+}
+
+
+/* ================= SUMMARY CARDS ================= */
+
+.analysis-summary{
+    display:flex;
+    gap:20px;
+    margin-bottom:25px;
+    flex-wrap:wrap;
+}
+
+.analysis-card{
+    background:white;
+    padding:20px;
+    border-radius:12px;
+    min-width:180px;
+
+    box-shadow:0 10px 25px rgba(0,0,0,0.06);
+
+    display:flex;
+    flex-direction:column;
+}
+
+.analysis-card .label{
+    font-size:13px;
+    color:#666;
+}
+
+.analysis-card .value{
+    font-size:22px;
+    font-weight:bold;
+    margin-top:5px;
+}
+
+.analysis-card.highlight{
+    background:#e3f2fd;
+}
+
+
+/* ================= CHART CONTAINER ================= */
+
+.chart-container{
+
+    margin-top:20px;
+
+    background:white;
+
+    padding:20px;
+
+    border-radius:12px;
+
+    box-shadow:0 10px 25px rgba(0,0,0,0.06);
+
+    height:420px;
+}
+
+
+/* ================= FORECAST GRAPH ================= */
+
+#forecastChart{
+
+    width:100% !important;
+
+    height:350px !important;
+
+}

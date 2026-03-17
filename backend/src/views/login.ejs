@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Login</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+
+<body>
+
+<div class="main-container">
+
+    <div class="left-panel">
+        <div style="font-size:60px;">💊</div>
+        <h1>Pharmacy</h1>
+        <p>Smart Pharmacy Management System</p>
+    </div>
+
+    <div class="right-panel">
+        <div class="form-box">
+            <h2>Login</h2>
+
+            <form action="/login" method="POST">
+                <label>Username</label>
+                <input type="text" name="username" required>
+
+                <label>Password</label>
+                <input type="password" name="password" required>
+
+                <label>Role</label>
+                <select name="role" required>
+                    <option value="">Select Role</option>
+                    <option value="Owner">Owner</option>
+                    <option value="Pharmacist">Pharmacist</option>
+                    <option value="Staff">Staff</option>
+                </select>
+
+                <button type="submit">Login</button>
+            </form>
+
+            <div class="bottom-link">
+                Don't have an account? <a href="/signup">Sign Up</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- 🔥 Alert Script -->
+<script src="/js/alert.js"></script>
+<!-- <script>
+document.body.style.backgroundColor = "red";
+</script> -->
+</body>
+</html>

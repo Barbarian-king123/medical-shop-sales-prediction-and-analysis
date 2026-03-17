@@ -1,0 +1,117 @@
+body {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    height: 100vh;
+}
+
+/* MAIN CONTAINER */
+.main-container {
+    display: flex;
+    height: 100vh;
+    flex-direction: row-reverse; /* Login left, Pharmacy right */
+}
+
+/* PHARMACY SIDE */
+.left-panel {
+    flex: 1;
+
+    background: linear-gradient(-45deg, #2b4c9a, #3b6fd8, #5f8fff, #7aa9ff);
+    background-size: 300% 300%;
+    animation: gradientMove 8s ease infinite;
+
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
+
+/* LOGIN SIDE */
+.right-panel {
+    flex: 1;
+    background: #eef2f7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Gradient Animation */
+@keyframes gradientMove {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* FORM BOX */
+.form-box {
+    background: white;
+    padding: 40px;
+    width: 380px;
+    border-radius: 15px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    transition: 0.3s ease;
+}
+
+.form-box h2 {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+/* FORM ELEMENTS */
+label {
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Apply same styling to input and select */
+input,
+select {
+    width: 100%;
+    padding: 10px;
+    margin: 8px 0 18px 0;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 14px;
+    background-color: white;
+}
+
+/* Focus effect for both */
+input:focus,
+select:focus {
+    border-color: #2a5298;
+    outline: none;
+}
+
+/* Make dropdown look clickable */
+select {
+    cursor: pointer;
+}
+
+/* BUTTON */
+button {
+    width: 100%;
+    padding: 12px;
+    background: #2a5298;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+button:hover {
+    opacity: 0.9;
+}
+
+/* Bottom Link */
+.bottom-link {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.bottom-link a {
+    color: #2a5298;
+    text-decoration: none;
+    font-weight: 600;
+}

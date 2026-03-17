@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Medicine Analysis</title>
+
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/analysis.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="layout">
+
+    <%- include('./partials/sidebar', { activePage: 'analysis', user: user }) %>
+
+    <div class="main">
+
+        <h2>Medicine Analysis</h2>
+
+        <div class="search-container">
+
+            <input
+                type="text"
+                id="medicineSearch"
+                placeholder="Search medicine..."
+                autocomplete="off"
+            >
+
+        </div>
+
+        <table class="analysis-table">
+
+            <thead>
+                <tr>
+                    <th>Medicine</th>
+                    <th>Generic</th>
+                    <th>ATC Code</th>
+                    <th>Total Stock</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+
+            <tbody id="medicineTableBody">
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<script src="/js/analysis.js"></script>
+
+</body>
+</html>

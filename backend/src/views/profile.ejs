@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>My Profile</title>
+
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/profile.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <%- include('./partials/sidebar', { activePage: 'profile', user: user }) %>
+
+    <div class="main">
+
+        <h2>My Profile</h2>
+
+        <div class="profile-card">
+
+            <div class="profile-info">
+
+                <p>
+                    <i class="fas fa-user"></i>
+                    <b>Username:</b>
+                    <span id="username"></span>
+                </p>
+
+                <p>
+                    <i class="fas fa-user-tag"></i>
+                    <b>Role:</b>
+                    <span id="role"></span>
+                </p>
+
+                <p>
+                    <i class="fas fa-circle-check"></i>
+                    <b>Status:</b>
+                    <span id="status"></span>
+                </p>
+
+            </div>
+
+            <hr>
+
+            <h3>Change Password</h3>
+
+            <form id="passwordForm">
+
+                <label>Current Password</label>
+                <input type="password" id="current_password" required>
+
+                <label>New Password</label>
+                <input type="password" id="new_password" required>
+
+                <button type="submit">Update Password</button>
+
+            </form>
+
+            <% if(user.role === "Owner"){ %>
+
+            <hr>
+
+            <h3>Change Username</h3>
+
+            <form id="usernameForm">
+
+                <label>New Username</label>
+                <input type="text" id="new_username" required>
+
+                <button type="submit">Update Username</button>
+
+            </form>
+
+            <% } %>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="/js/profile.js"></script>
+
+</body>
+</html>

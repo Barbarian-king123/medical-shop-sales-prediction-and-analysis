@@ -1,0 +1,148 @@
+/* ================= MAIN ================= */
+
+.main{
+    padding:30px;
+}
+
+/* ================= TITLE ================= */
+
+.main h2{
+    color:#1e88e5;
+    margin-bottom:20px;
+}
+
+/* ================= ACTION BUTTONS ================= */
+
+.notification-actions{
+    margin-bottom:20px;
+    display:flex;
+    gap:10px;
+}
+
+.notification-actions button{
+    padding:10px 16px;
+    border:none;
+    border-radius:8px;
+    cursor:pointer;
+    color:white;
+    font-size:14px;
+}
+
+/* Expiry button */
+#checkExpiry{
+    background:#fb8c00;
+}
+
+#checkExpiry:hover{
+    background:#ef6c00;
+}
+
+/* Stock button */
+#checkStock{
+    background:#43a047;
+}
+
+#checkStock:hover{
+    background:#2e7d32;
+}
+
+/* ================= NOTIFICATION TABLE ================= */
+
+.notification-table{
+    width:100%;
+    border-collapse:collapse;
+    background:white;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 10px 25px rgba(0,0,0,0.06);
+}
+
+/* HEADER */
+
+.notification-table thead{
+    background:#1e88e5;
+}
+
+.notification-table thead th{
+    color:white;
+    padding:14px 16px;
+    text-align:left;
+}
+
+/* BODY */
+
+.notification-table td{
+    padding:12px 14px;
+    border-bottom:1px solid #eee;
+    font-size:14px;
+}
+
+.notification-table tr:nth-child(even){
+    background:#f9fbff;
+}
+
+.notification-table tr:hover{
+    background:#e3f2fd;
+}
+
+/* ================= ALERT TYPES ================= */
+
+/* LOW STOCK */
+
+.low-stock{
+    color:#e53935;
+    font-weight:600;
+}
+
+/* EXPIRY */
+
+.expiry{
+    color:#fb8c00;
+    font-weight:600;
+}
+
+/* NORMAL */
+
+.normal{
+    color:#555;
+}
+
+/* ================= EMPTY STATE ================= */
+
+.notification-table td[colspan]{
+    text-align:center;
+    padding:20px;
+    color:#888;
+    font-style:italic;
+}
+
+/* ================= RESPONSIVE ================= */
+
+@media (max-width:768px){
+
+    .notification-table thead{
+        display:none;
+    }
+
+    .notification-table,
+    .notification-table tbody,
+    .notification-table tr,
+    .notification-table td{
+        display:block;
+        width:100%;
+    }
+
+    .notification-table tr{
+        margin-bottom:15px;
+        background:white;
+        border-radius:10px;
+        box-shadow:0 5px 15px rgba(0,0,0,0.05);
+        padding:10px;
+    }
+
+    .notification-table td{
+        border:none;
+        padding:8px 10px;
+    }
+
+}

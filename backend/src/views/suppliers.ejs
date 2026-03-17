@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Suppliers</title>
+
+<link rel="stylesheet" href="/css/layout.css">
+<link rel="stylesheet" href="/css/dashboard.css">
+<link rel="stylesheet" href="/css/suppliers.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="layout">
+
+<%- include('./partials/sidebar', { activePage: 'suppliers', user: user }) %>
+
+<div class="main">
+
+<h2>Suppliers</h2>
+
+<button id="toggleSupplierForm">+ Add Supplier</button>
+
+<div id="supplierFormContainer" style="display:none; margin-top:15px;">
+
+<h3>Add Supplier</h3>
+
+<form id="supplierForm">
+
+<label>Supplier Name</label>
+<input type="text" id="supplier_name" required>
+
+<label>Phone</label>
+<input type="text" id="phone">
+
+<label>Email</label>
+<input type="email" id="email">
+
+<button type="submit">Create Supplier</button>
+
+</form>
+
+</div>
+
+<hr>
+
+<h3>Supplier List</h3>
+
+<table>
+
+<thead>
+<tr>
+<th>ID</th>
+<th>Name</th>
+<th>Phone</th>
+<th>Status</th>
+<th>Actions</th>
+</tr>
+</thead>
+
+<tbody id="supplierTable"></tbody>
+
+</table>
+
+<div id="supplierDetails"></div>
+
+</div>
+
+</div>
+
+<script src="/js/supplier.js"></script>
+
+</body>
+</html>

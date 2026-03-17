@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Medicine Inventory</title>
+
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/inventory.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <!-- SIDEBAR -->
+    <%- include('partials/sidebar', { activePage: 'inventory', user: user }) %>
+
+    <!-- MAIN -->
+    <div class="main">
+
+        <!-- TOPBAR -->
+        <div class="topbar">
+            <div class="search-box">
+                <i class="fas fa-search"></i>
+                <input type="text" id="searchInput" placeholder="Search medicines...">
+            </div>
+
+            <% if (user.role === "Owner") { %>
+                <button id="addMedicineBtn" class="primary-btn">
+                    + Add Medicine
+                </button>
+            <% } %>
+        </div>
+
+        <!-- MEDICINE TABLE -->
+        <div class="table-section">
+            <h3>Medicine Inventory</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Brand</th>
+                        <th>Generic</th>
+                        <th>ATC Code</th>
+                        <th>GST %</th>
+                        <th>Total Stock</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody id="inventoryBody">
+                    <!-- Example row (JS will generate dynamically) -->
+                    <!--
+                    <tr>
+                        <td>Paracetamol</td>
+                        <td>Acetaminophen</td>
+                        <td>N02BE01</td>
+                        <td>5%</td>
+                        <td>120</td>
+
+                        <td class="action-buttons">
+
+                            <button class="view-batches-btn" data-id="3">
+                                <i class="fa-solid fa-boxes-stacked"></i>
+                                Batches
+                            </button>
+
+                            <button class="stock-movement-btn" data-id="3">
+                                <i class="fa-solid fa-arrows-rotate"></i>
+                                Movements
+                            </button>
+
+                        </td>
+                    </tr>
+                    -->
+                </tbody>
+            </table>
+        </div>
+
+        <!-- BATCH DETAILS -->
+        <div id="batchSection" class="batch-section hidden">
+            <h3>Batch Details</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Batch No</th>
+                        <th>Expiry</th>
+                        <th>Quantity</th>
+                        <th>MRP</th>
+                        <th>Purchase Price</th>
+
+                        <% if (user.role === "Owner") { %>
+                            <th>Action</th>
+                        <% } %>
+                    </tr>
+                </thead>
+
+                <tbody id="batchBody">
+
+                    <!-- Example batch row (JS will generate dynamically) -->
+
+                    <!--
+                    <tr>
+                        <td>PCM2025A</td>
+                        <td>2027-01-01</td>
+                        <td>200</td>
+                        <td>25</td>
+                        <td>18</td>
+
+                        <td class="action-buttons">
+
+                            <button class="restock-btn" data-batch="10">
+                                <i class="fa-solid fa-plus"></i>
+                                Restock
+                            </button>
+
+                            <button class="adjust-btn" data-batch="10">
+                                <i class="fa-solid fa-sliders"></i>
+                                Adjust
+                            </button>
+
+                        </td>
+                    </tr>
+                    -->
+
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<!-- PASS USER ROLE TO JS -->
+<script>
+    window.currentUserRole = "<%= user.role %>";
+</script>
+
+<script src="/js/inventory.js"></script>
+
+</body>
+</html>

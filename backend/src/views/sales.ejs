@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Sales Report</title>
+    <link rel="stylesheet" href="/css/salesreport.css">
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<div class="layout">
+
+    <!-- Sidebar -->
+    <%- include('./partials/sidebar', { activePage: 'sales', user: user }) %>
+
+    <div class="main">
+
+        <!-- Header -->
+        <div class="topbar">
+            <h2>Sales Report</h2>
+
+            <div class="date-filter">
+                <input type="date" id="startDate">
+                <input type="date" id="endDate">
+                <button id="loadReport">Load Report</button>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="summary-cards">
+
+            <div class="card">
+                <h3 id="totalBills">0</h3>
+                <p>Total Bills</p>
+            </div>
+
+            <div class="card">
+                <h3 id="totalSales">₹0</h3>
+                <p>Total Sales</p>
+            </div>
+
+            <div class="card">
+                <h3 id="gstCollected">₹0</h3>
+                <p>GST Collected</p>
+            </div>
+
+            <div class="card">
+                <h3 id="netProfit">₹0</h3>
+                <p>Net Profit</p>
+            </div>
+
+        </div>
+
+        <!-- Sales Table -->
+        <div class="table-section">
+            <h3>Medicine Wise Sales</h3>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Generic Name</th>
+                        <th>Units Sold</th>
+                        <th>Total Sales</th>
+                        <th>GST</th>
+                        <th>Net Profit</th>
+                    </tr>
+                </thead>
+                <tbody id="salesTableBody">
+                    <!-- Dynamic rows -->
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</div>
+
+<script>
+document.getElementById("loadReport").addEventListener("click", async () => {
+
+    const startDate = document.getElementById("startDate").value;
+    const endDate = document.getElementById("endDate").value;
+
+    if (!startDate || !endDate) {
+        alert("Please select both dates");
+        return;
+    }
+
+    try {
+
+        // 1️⃣ Fetch summary
+        const summaryRes = await fetch(
+            `/api/reports/summary?startDate=${startDate}&endDate=${endDate}`,
+            { credentials: "include" }
+        );
+
+        const summaryData = await summaryRes.json();
+
+        if (summaryRes.ok) {
+            document.getElementById("totalBills").innerText =
+                summaryData.data.totalBills;
+
+            document.getElementById("totalSales").innerText =
+                "₹" + summaryData.data.totalSales;
+
+            document.getElementById("gstCollected").innerText =
+                "₹" + summaryData.data.gstCollected;
+
+            document.getElementById("netProfit").innerText =
+                "₹" + summaryData.data.netProfit;
+        }
+
+        // 2️⃣ Fetch medicine-wise report
+        const medicineRes = await fetch(
+            `/api/reports/sales/generic?startDate=${startDate}&endDate=${endDate}`,
+            { credentials: "include" }
+        );
+
+        const medicineData = await medicineRes.json();
+
+        const tbody = document.getElementById("salesTableBody");
+        tbody.innerHTML = "";
+
+        if (medicineRes.ok && medicineData.data.length) {
+
+            medicineData.data.forEach(item => {
+
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${item.generic_name}</td>
+                    <td>${item.total_units_sold}</td>
+                    <td>₹${item.total_sales}</td>
+                    <td>₹${item.total_gst}</td>
+                    <td>₹${item.net_profit}</td>
+                `;
+
+                tbody.appendChild(row);
+            });
+
+        } else {
+            tbody.innerHTML = `<tr><td colspan="5">No data found</td></tr>`;
+        }
+
+    } catch (err) {
+        console.error("Report error:", err);
+        alert("Failed to load report");
+    }
+});
+</script>
+<script src="/js/sales.js"></script>
+</body>
+</html>

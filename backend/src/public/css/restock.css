@@ -1,0 +1,85 @@
+/* ==========================
+   Restock Page Styling
+========================== */
+
+.main {
+    padding: 30px;
+}
+
+/* Page Title */
+
+.main h2 {
+    font-size: 24px;
+    margin-bottom: 25px;
+    color: #2c3e50;
+}
+
+/* Form Container */
+
+#orderForm {
+    background: #ffffff;
+    padding: 25px;
+    max-width: 420px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Labels */
+
+#orderForm label {
+    font-weight: 600;
+    color: #444;
+}
+
+/* Inputs */
+
+#orderForm input,
+#orderForm select {
+    padding: 10px 12px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    font-size: 14px;
+    transition: border 0.2s;
+}
+
+/* Focus effect */
+
+#orderForm input:focus,
+#orderForm select:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+/* Button */
+
+#orderForm button {
+    margin-top: 10px;
+    padding: 11px;
+    border: none;
+    border-radius: 6px;
+    background: #4CAF50;
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+/* Hover */
+
+#orderForm button:hover {
+    background: #43a047;
+}
+
+/* Mobile responsive */
+
+@media (max-width: 768px) {
+
+    #orderForm {
+        max-width: 100%;
+    }
+
+}

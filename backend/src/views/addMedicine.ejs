@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Medicine</title>
+
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/addMedicine.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="layout">
+
+    <%- include('partials/sidebar', { activePage: 'inventory', user: user }) %>
+
+    <div class="main">
+
+        <div class="form-container">
+            <h2>Add New Medicine</h2>
+
+            <form id="addMedicineForm">
+
+                <div class="form-group">
+                    <label>Brand Name *</label>
+                    <input type="text" name="name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Generic Name *</label>
+                    <input type="text" name="generic_name" required>
+                </div>
+
+                <div class="form-group">
+                    <label>ATC Code *</label>
+                    <input type="text" name="atc_code" required>
+                </div>
+
+                <div class="form-group">
+                    <label>HSN Code *</label>
+                    <input type="text" name="hsn_code" required>
+                </div>
+
+                <div class="form-group">
+                    <label>GST Rate (%) *</label>
+                    <input type="number" name="gst_rate" required min="0" step="0.01">
+                </div>
+
+                <div class="form-group">
+                    <label>Target Stock Days</label>
+                    <input type="number" name="target_stock_days" value="30">
+                </div>
+
+                <div class="form-group">
+                    <label>Expiry Alert Days</label>
+                    <input type="number" name="expiry_alert_days" value="60">
+                </div>
+
+                <button type="submit" class="primary-btn">
+                    Add Medicine
+                </button>
+
+            </form>
+        </div>
+
+    </div>
+</div>
+
+<script src="/js/addMedicine.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,43 @@
+.sidebar {
+    width: 300px;
+    background: #1e88e5;
+    color: white;
+    padding: 25px;
+    box-sizing: border-box;
+}
+
+.sidebar h2 {
+    margin-bottom: 40px;
+    font-weight: 600;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.sidebar li {
+    margin-bottom: 12px;
+}
+
+.sidebar a {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 12px;
+    border-radius: 10px;
+    text-decoration: none;
+    color: white;   /* 🔥 important */
+    transition: 0.3s;
+}
+
+.sidebar li i {
+    width: 20px;
+    text-align: center;
+}
+
+.sidebar li:hover a,
+.sidebar li.active a {
+    background: rgba(255,255,255,0.2);
+}

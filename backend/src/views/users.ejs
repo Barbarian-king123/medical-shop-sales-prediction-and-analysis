@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>User Management</title>
+
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/users.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="layout">
+
+<%- include('./partials/sidebar', { activePage: 'users', user: user }) %>
+
+<div class="main">
+
+<h2>User Management</h2>
+
+<button id="toggleAddUser">+ Add User</button>
+
+<div id="addUserContainer" style="display:none;margin-top:15px;">
+
+<h3>Create User</h3>
+
+<form id="addUserForm">
+
+<label>Username</label>
+<input type="text" id="username" required>
+
+<label>Password</label>
+<input type="password" id="password" required>
+
+<label>Role</label>
+<select id="role">
+<option value="Staff">Staff</option>
+<option value="Pharmacist">Pharmacist</option>
+<option value="Owner">Owner</option>
+</select>
+
+<button type="submit">Create User</button>
+
+</form>
+
+</div>
+
+<hr>
+
+<h3>User List</h3>
+
+<table border="1" width="100%" cellpadding="10">
+
+<thead>
+
+<tr>
+<th>ID</th>
+<th>Username</th>
+<th>Role</th>
+<th>Status</th>
+<th>Actions</th>
+</tr>
+
+</thead>
+
+<tbody id="usersTable"></tbody>
+
+</table>
+
+</div>
+
+</div>
+
+<script src="/js/users.js"></script>
+
+</body>
+</html>

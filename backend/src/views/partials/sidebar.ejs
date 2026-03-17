@@ -1,0 +1,96 @@
+<div class="sidebar">
+    <h2 class="logo">Pharmacy</h2>
+
+    <ul class="menu">
+
+        <li class="<%= activePage === 'dashboard' ? 'active' : '' %>">
+            <a href="/dashboard">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </a>
+        </li>
+
+        <li class="<%= activePage === 'billing' ? 'active' : '' %>">
+            <a href="/billing">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span>Billing</span>
+            </a>
+        </li>
+
+        <% if (user && (user.role === "Owner" || user.role === "Pharmacist")) { %>
+
+        <li class="<%= activePage === 'inventory' ? 'active' : '' %>">
+            <a href="/inventory">
+                <i class="fas fa-pills"></i>
+                <span>Inventory</span>
+            </a>
+        </li>
+
+        <li class="<%= activePage === 'orders' ? 'active' : '' %>">
+            <a href="/orders">
+                <i class="fas fa-truck-loading"></i>
+                <span>Orders</span>
+            </a>
+        </li>
+
+        <li class="<%= activePage === 'suppliers' ? 'active' : '' %>">
+            <a href="/suppliers">
+                <i class="fas fa-industry"></i>
+                <span>Suppliers</span>
+            </a>
+        </li>
+
+        <% } %>
+
+        <% if (user && user.role === "Owner") { %>
+
+        <li class="<%= activePage === 'notifications' ? 'active' : '' %>">
+            <a href="/notifications">
+                <i class="fas fa-bell"></i>
+                <span>Notifications</span>
+            </a>
+        </li>
+
+        <li class="<%= activePage === 'analysis' ? 'active' : '' %>">
+            <a href="/analysis">
+                <i class="fas fa-chart-pie"></i>
+                <span>Analysis</span>
+            </a>
+        </li>
+
+        <% } %>
+
+        <% if (user && user.role !== "Staff") { %>
+
+        <li class="<%= activePage === 'sales' ? 'active' : '' %>">
+            <a href="/sales">
+                <i class="fas fa-chart-bar"></i>
+                <span>Sales Report</span>
+            </a>
+        </li>
+
+        <% } %>
+        
+        <li class="<%= activePage === 'users' ? 'active' : '' %>">
+        <a href="/users">
+        <i class="fas fa-users"></i>
+        <span>User Management</span>
+        </a>
+        </li>
+
+        <li class="<%= activePage === 'profile' ? 'active' : '' %>">
+            <a href="/profile">
+                <i class="fas fa-user"></i>
+                <span>My Profile</span>
+            </a>
+        </li>
+
+        <li class="logout">
+            <a href="/logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </a>
+        </li>
+
+    </ul>
+</div>

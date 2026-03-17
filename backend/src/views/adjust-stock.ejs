@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Adjust Stock</title>
+
+<link rel="stylesheet" href="/css/layout.css">
+<link rel="stylesheet" href="/css/dashboard.css">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="layout">
+
+<%- include('./partials/sidebar', { activePage: 'inventory', user: user }) %>
+
+<div class="main">
+
+<h2>Adjust Stock</h2>
+
+<form id="adjustForm">
+
+<label>Batch ID</label>
+<input type="text" id="batch_id" readonly>
+
+<label>Change Quantity</label>
+<input type="number" id="change_qty">
+
+<label>Reason</label>
+<input type="text" id="reason">
+
+<button type="submit">Adjust Stock</button>
+
+</form>
+
+</div>
+
+</div>
+
+<script src="/js/adjust-stock.js"></script>
+
+</body>
+</html>

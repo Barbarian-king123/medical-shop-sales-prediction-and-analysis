@@ -1,0 +1,164 @@
+/* ================= MAIN ================= */
+
+.main{
+    padding:30px;
+}
+
+/* ================= TITLE ================= */
+
+.main h2{
+    color:#1e88e5;
+    margin-bottom:20px;
+}
+
+/* ================= ADD USER BUTTON ================= */
+
+#toggleAddUser{
+    padding:10px 16px;
+    background:#1e88e5;
+    border:none;
+    border-radius:8px;
+    color:white;
+    cursor:pointer;
+    font-size:14px;
+}
+
+#toggleAddUser:hover{
+    background:#1565c0;
+}
+
+/* ================= CREATE USER FORM ================= */
+
+#addUserContainer{
+    background:white;
+    padding:25px;
+    border-radius:15px;
+    margin-top:15px;
+    max-width:500px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.06);
+}
+
+#addUserContainer h3{
+    margin-bottom:15px;
+    color:#1e88e5;
+}
+
+#addUserForm label{
+    display:block;
+    margin-top:10px;
+    margin-bottom:5px;
+}
+
+#addUserForm input,
+#addUserForm select{
+    width:100%;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    margin-bottom:10px;
+    font-size:14px;
+}
+
+#addUserForm input:focus,
+#addUserForm select:focus{
+    outline:none;
+    border-color:#1e88e5;
+}
+
+/* CREATE BUTTON */
+
+#addUserForm button{
+    margin-top:10px;
+    padding:10px 16px;
+    background:#43a047;
+    border:none;
+    border-radius:8px;
+    color:white;
+    cursor:pointer;
+}
+
+#addUserForm button:hover{
+    background:#2e7d32;
+}
+
+/* ================= TABLE ================= */
+
+table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+    background:white;
+    border-radius:12px;
+    overflow:hidden;
+    box-shadow:0 10px 25px rgba(0,0,0,0.06);
+}
+
+/* TABLE HEADER */
+
+table thead{
+    background:#1e88e5;
+}
+
+table thead th{
+    color:white;
+    padding:14px 16px;
+    text-align:left;
+}
+
+/* TABLE BODY */
+
+table tbody td{
+    padding:14px 16px;
+    border-bottom:1px solid #eee;
+}
+
+table tbody tr:nth-child(even){
+    background:#f9fbff;
+}
+
+table tbody tr:hover{
+    background:#e3f2fd;
+}
+
+/* ================= ACTION BUTTONS ================= */
+
+tbody button{
+    padding:6px 10px;
+    border:none;
+    border-radius:6px;
+    font-size:12px;
+    cursor:pointer;
+    margin-right:5px;
+}
+
+/* USERNAME */
+
+tbody button:nth-child(1){
+    background:#1e88e5;
+    color:white;
+}
+
+/* PASSWORD */
+
+tbody button:nth-child(2){
+    background:#8e24aa;
+    color:white;
+}
+
+/* ROLE */
+
+tbody button:nth-child(3){
+    background:#fb8c00;
+    color:white;
+}
+
+/* STATUS */
+
+tbody button:nth-child(4){
+    background:#43a047;
+    color:white;
+}
+
+tbody button:hover{
+    opacity:0.9;
+}

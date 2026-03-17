@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notifications</title>
+
+    <link rel="stylesheet" href="/css/layout.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/notifications.css">
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body>
+
+<div class="layout">
+
+    <%- include('./partials/sidebar', { activePage: 'notifications', user: user }) %>
+
+    <div class="main">
+
+        <h2>Notifications</h2>
+
+        <!-- ACTION BUTTONS -->
+        <div class="notification-actions">
+            <button id="checkExpiry">Check Expiry</button>
+            <button id="checkStock">Check Low Stock</button>
+        </div>
+
+        <!-- NOTIFICATIONS TABLE -->
+        <table class="notification-table">
+            <thead>
+                <tr>
+                    <th>Type</th>
+                    <th>Medicine</th>
+                    <th>Message</th>
+                    <th>Date</th>
+                </tr>
+            </thead>
+
+            <tbody id="notificationBody">
+                <!-- Filled dynamically -->
+            </tbody>
+        </table>
+
+    </div>
+
+</div>
+
+<script src="/js/notifications.js"></script>
+</body>
+</html>

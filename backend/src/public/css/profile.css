@@ -1,0 +1,99 @@
+/* ================= MAIN ================= */
+
+.main{
+    padding:30px;
+}
+
+/* ================= PAGE TITLE ================= */
+
+.main h2{
+    color:#1e88e5;
+    margin-bottom:20px;
+}
+
+/* ================= PROFILE CARD ================= */
+
+.profile-card{
+    background:white;
+    padding:30px;
+    border-radius:18px;
+    max-width:600px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.06);
+}
+
+/* ================= PROFILE INFO ================= */
+
+.profile-info p{
+    margin:12px 0;
+    font-size:15px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+}
+
+.profile-info i{
+    color:#1e88e5;
+    width:20px;
+}
+
+/* ================= STATUS BADGE ================= */
+
+#status{
+    font-weight:600;
+}
+
+/* ================= SECTION TITLES ================= */
+
+.profile-card h3{
+    margin-top:20px;
+    margin-bottom:15px;
+    color:#1e88e5;
+}
+
+/* ================= FORM ================= */
+
+form label{
+    display:block;
+    margin-bottom:5px;
+    font-weight:500;
+}
+
+form input{
+    width:100%;
+    padding:10px 12px;
+    border-radius:8px;
+    border:1px solid #ccc;
+    margin-bottom:12px;
+    font-size:14px;
+}
+
+/* INPUT FOCUS */
+
+form input:focus{
+    outline:none;
+    border-color:#1e88e5;
+}
+
+/* ================= BUTTON ================= */
+
+form button{
+    padding:10px 16px;
+    background:#1e88e5;
+    border:none;
+    border-radius:8px;
+    color:white;
+    cursor:pointer;
+    font-size:14px;
+}
+
+form button:hover{
+    background:#1565c0;
+}
+
+/* ================= DIVIDER ================= */
+
+.profile-card hr{
+    border:none;
+    border-top:1px solid #eee;
+    margin:25px 0;
+}
