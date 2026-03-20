@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
+
     // ===============================
     // LOAD MEDICINES
     // ===============================
@@ -38,7 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 return;
             }
-
+            
             result.data.forEach(med => {
 
                 const row = document.createElement("tr");
@@ -127,7 +128,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
                 row.innerHTML = `
                     <td>${batch.batch_number}</td>
-                    <td>${batch.expiry_date}</td>
+                    <td>${new Date(batch.expiry_date).toISOString().split("T")[0]}</td>
                     <td>${batch.quantity}</td>
                     <td>${batch.mrp}</td>
                     <td>${batch.purchase_price}</td>
@@ -171,11 +172,24 @@ document.addEventListener("DOMContentLoaded", function () {
     // ===============================
     // INVENTORY TABLE EVENTS
     // ===============================
+    let currentMedicineId = null;
+
     inventoryBody.addEventListener("click", function (e) {
 
     const medicineId = e.target.dataset.id;
 
     if (e.target.classList.contains("view-btn")) {
+
+        // If same medicine clicked again → hide
+        if (currentMedicineId === medicineId) {
+            batchSection.classList.add("hidden");
+            batchBody.innerHTML = "";
+            currentMedicineId = null;
+            return;
+        }
+
+        // Otherwise load new batches
+        currentMedicineId = medicineId;
         loadBatches(medicineId);
     }
 
@@ -278,6 +292,7 @@ async function adjustStock(batchId, changeQty, reason) {
     }
 
 }
+
 
 
     // ===============================

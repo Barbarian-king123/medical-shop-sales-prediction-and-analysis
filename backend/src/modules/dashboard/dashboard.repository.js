@@ -62,13 +62,19 @@ exports.getAtcDistribution = async (user) => {
   return query;
 };
 exports.getWeeklyDayDistribution = async (user) => {
+  const subquery = db("sales_items")
+    .select("invoice_id")
+    .sum("quantity as total_quantity")
+    .groupBy("invoice_id")
+    .as("si");
+
   const query = db("sales_master as sm")
-    .join("sales_items as si", "si.invoice_id", "sm.invoice_id")
+    .join(subquery, "si.invoice_id", "sm.invoice_id")
     .select(
       db.raw("TRIM(TO_CHAR(sm.sale_date, 'Day')) as day_name"),
       db.raw("EXTRACT(DOW FROM sm.sale_date) as day_number"),
-      db.raw("SUM(DISTINCT sm.total_sale_amount) as total_sales"),
-      db.raw("SUM(si.quantity) as total_quantity")
+      db.raw("SUM(sm.total_sale_amount) as total_sales"),
+      db.raw("SUM(si.total_quantity) as total_quantity")
     )
     .where("sm.sale_date", ">=", db.raw("NOW() - INTERVAL '7 days'"))
     .groupByRaw("day_name, day_number")

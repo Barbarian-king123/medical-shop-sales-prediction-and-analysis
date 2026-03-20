@@ -11,44 +11,9 @@
     margin-bottom:20px;
 }
 
-/* ================= ACTION BUTTONS ================= */
+/* ================= BILLING TABLE ================= */
 
-.notification-actions{
-    margin-bottom:20px;
-    display:flex;
-    gap:10px;
-}
-
-.notification-actions button{
-    padding:10px 16px;
-    border:none;
-    border-radius:8px;
-    cursor:pointer;
-    color:white;
-    font-size:14px;
-}
-
-/* Expiry button */
-#checkExpiry{
-    background:#fb8c00;
-}
-
-#checkExpiry:hover{
-    background:#ef6c00;
-}
-
-/* Stock button */
-#checkStock{
-    background:#43a047;
-}
-
-#checkStock:hover{
-    background:#2e7d32;
-}
-
-/* ================= NOTIFICATION TABLE ================= */
-
-.notification-table{
+.billing-table{
     width:100%;
     border-collapse:collapse;
     background:white;
@@ -57,92 +22,136 @@
     box-shadow:0 10px 25px rgba(0,0,0,0.06);
 }
 
-/* HEADER */
+/* TABLE HEADER */
 
-.notification-table thead{
+.billing-table thead{
     background:#1e88e5;
 }
 
-.notification-table thead th{
+.billing-table thead th{
     color:white;
     padding:14px 16px;
     text-align:left;
+    background:#1e88e5;
 }
 
-/* BODY */
+/* TABLE BODY */
 
-.notification-table td{
+.billing-table td{
     padding:12px 14px;
     border-bottom:1px solid #eee;
-    font-size:14px;
 }
 
-.notification-table tr:nth-child(even){
+.billing-table tr:nth-child(even){
     background:#f9fbff;
 }
 
-.notification-table tr:hover{
+.billing-table tr:hover{
     background:#e3f2fd;
 }
 
-/* ================= ALERT TYPES ================= */
+/* ================= INPUTS ================= */
 
-/* LOW STOCK */
-
-.low-stock{
-    color:#e53935;
-    font-weight:600;
+.billing-table input{
+    width:100%;
+    padding:8px 10px;
+    border-radius:6px;
+    border:1px solid #ccc;
+    font-size:13px;
 }
 
-/* EXPIRY */
-
-.expiry{
-    color:#fb8c00;
-    font-weight:600;
+.billing-table input:focus{
+    outline:none;
+    border-color:#1e88e5;
 }
 
-/* NORMAL */
+/* ================= SEARCH RESULTS ================= */
 
-.normal{
-    color:#555;
+.search-results{
+    position:absolute;
+    background:white;
+    border:1px solid #ddd;
+    border-radius:6px;
+    max-height:180px;
+    overflow-y:auto;
+    width:250px;
+    display:none;
+    z-index:100;
 }
 
-/* ================= EMPTY STATE ================= */
+.search-results div{
+    padding:8px 10px;
+    cursor:pointer;
+    font-size:13px;
+}
 
-.notification-table td[colspan]{
-    text-align:center;
+.search-results div:hover{
+    background:#e3f2fd;
+}
+
+/* ================= REMOVE BUTTON ================= */
+
+.removeRow{
+    background:#e53935;
+    color:white;
+    border:none;
+    padding:6px 10px;
+    border-radius:6px;
+    cursor:pointer;
+}
+
+.removeRow:hover{
+    background:#c62828;
+}
+
+/* ================= ADD ROW BUTTON ================= */
+
+#addRow{
+    margin-top:15px;
+    padding:10px 16px;
+    border:none;
+    background:#1e88e5;
+    color:white;
+    border-radius:8px;
+    cursor:pointer;
+}
+
+#addRow:hover{
+    background:#1565c0;
+}
+
+/* ================= BILLING SUMMARY ================= */
+
+.billing-summary{
+    margin-top:25px;
+    background:white;
     padding:20px;
-    color:#888;
-    font-style:italic;
+    border-radius:12px;
+    box-shadow:0 10px 25px rgba(0,0,0,0.06);
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
 }
 
-/* ================= RESPONSIVE ================= */
+/* GRAND TOTAL */
 
-@media (max-width:768px){
+.billing-summary h3{
+    margin:0;
+    color:#1e88e5;
+}
 
-    .notification-table thead{
-        display:none;
-    }
+/* COMPLETE SALE BUTTON */
 
-    .notification-table,
-    .notification-table tbody,
-    .notification-table tr,
-    .notification-table td{
-        display:block;
-        width:100%;
-    }
+#completeSale{
+    padding:12px 18px;
+    border:none;
+    border-radius:8px;
+    background:#43a047;
+    color:white;
+    cursor:pointer;
+    font-size:14px;
+}
 
-    .notification-table tr{
-        margin-bottom:15px;
-        background:white;
-        border-radius:10px;
-        box-shadow:0 5px 15px rgba(0,0,0,0.05);
-        padding:10px;
-    }
-
-    .notification-table td{
-        border:none;
-        padding:8px 10px;
-    }
-
+#completeSale:hover{
+    background:#2e7d32;
 }

@@ -3,10 +3,30 @@ const controller = require("./notification.controller");
 
 const router = express.Router();
 
-router.get("/",controller.getNotifications);
+// ===============================
+// GET NOTIFICATIONS
+// ===============================
+router.get("/", controller.getNotifications);
 
-router.post("/check-expiry",controller.runExpiryCheck);
+// ===============================
+// RUN CHECKS
+// ===============================
+router.post("/check-expiry", controller.runExpiryCheck);
+router.post("/check-stock", controller.runStockCheck);
 
-router.post("/check-stock",controller.runStockCheck);
+// ===============================
+// NEW ROUTES (IMPORTANT)
+// ===============================
+
+// Resolve single notification
+router.patch("/:id/resolve", controller.resolveNotification);
+
+// Clear all notifications
+router.patch("/clear-all", controller.clearAllNotifications);
+// NEW ROUTES
+
+router.get("/low-stock", controller.getLowStockNotifications);
+
+router.get("/expiry", controller.getExpiryNotifications);
 
 module.exports = router;

@@ -1,3 +1,17 @@
+function filterOrders(status) {
+
+  // 👉 Load orders
+  loadOrders(status);
+
+  // 👉 Remove active from all buttons
+  document.querySelectorAll(".filter-btn").forEach(btn => {
+    btn.classList.remove("active");
+  });
+
+  // 👉 Add active to clicked button
+  event.target.classList.add("active");
+}
+
 async function loadOrders(status = "") {
 
   let url = "/api/orders";
@@ -64,13 +78,24 @@ async function loadOrders(status = "") {
 }
 
 
-
+let currentOrderId = null;
 function showReceiveForm(orderId) {
 
   const container = document.getElementById("orderDetails");
 
-  container.innerHTML = `
+  // 👉 If same order clicked → hide
+  if (currentOrderId === orderId) {
+    container.innerHTML = "";
+    container.style.display = "none"; // hide container
+    currentOrderId = null;
+    return;
+  }
 
+  // 👉 Show container
+  container.style.display = "block";
+  currentOrderId = orderId;
+
+  container.innerHTML = `
     <h3>Receive Order #${orderId}</h3>
 
     <label>Medicine ID</label>
@@ -97,9 +122,7 @@ function showReceiveForm(orderId) {
     <button onclick="receiveOrder(${orderId})">
       Confirm Receive
     </button>
-
   `;
-
 }
 
 
@@ -172,6 +195,7 @@ async function cancelOrder(orderId) {
   loadOrders();
 
 }
+
 
 
 loadOrders();

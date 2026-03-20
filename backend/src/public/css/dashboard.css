@@ -1,20 +1,19 @@
-/* RESET */
+/* ================= RESET ================= */
 html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    overflow: hidden;
     font-family: 'Segoe UI', sans-serif;
     background: #eef6ff;
 }
 
-/* LAYOUT */
+/* ================= LAYOUT ================= */
 .layout {
     display: flex;
     height: 100vh;
 }
 
-/* MAIN */
+/* ================= MAIN ================= */
 .main {
     flex: 1;
     padding: 30px;
@@ -22,12 +21,12 @@ html, body {
     overflow-y: auto;
 }
 
-/* TOPBAR */
+/* ================= TOPBAR ================= */
 .topbar {
     margin-bottom: 25px;
 }
 
-/* SEARCH BOX */
+/* ================= SEARCH BOX ================= */
 .search-box {
     background: white;
     padding: 12px 20px;
@@ -50,15 +49,15 @@ html, body {
     font-size: 14px;
 }
 
-/* CARDS */
+/* ================= CARDS ================= */
 .cards {
-    display: flex;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* better than flex */
     gap: 20px;
     margin-bottom: 25px;
 }
 
 .card {
-    flex: 1;
     background: white;
     padding: 20px;
     border-radius: 18px;
@@ -80,47 +79,62 @@ html, body {
     font-weight: bold;
 }
 
-/* CHARTS */
-/* .charts {
-    display: flex;
+/* ================= CHARTS ================= */
+/* ================= CHARTS ================= */
+.charts {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
     gap: 20px;
-    margin-bottom: 25px;
 }
 
+/* ================= CHART BOX ================= */
 .chart-box {
-    flex: 1;
     background: white;
     padding: 20px;
     border-radius: 18px;
     box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-    height: 220px;
-    width: 5%;
+
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+
+/* ================= CHART TITLE ================= */
+.chart-box h3 {
+    margin-bottom: 10px;
+}
+
+/* ================= CHART CONTAINER ================= */
+.chart-container {
+    flex: 1;                /* 🔥 take full space */
     position: relative;
 }
 
-.chart-box canvas {
-    width: 100% !important;
-    height: 100% !important;
-} */
-.charts {
-    display: flex;
-    gap: 20px;
-}
-
-.chart-box {    
-    width: 45%;
-    height: 380px;
-    background: white;
-    padding: 15px;
-    border-radius: 16px;
-    box-shadow: 0 6px 18px rgba(0,0,0,0.05);
-}
-
-.chart-box canvas {
+/* ================= CANVAS ================= */
+.chart-container canvas {
+    position: absolute;     /* 🔥 fill container */
+    top: 0;
+    left: 0;
     width: 100% !important;
     height: 100% !important;
 }
-/* TABLE */
+
+/* ❌ REMOVE THESE (IMPORTANT) */
+/*
+.chart-container {
+    width: 80%;
+    margin: auto;
+}
+
+#barChart {
+    height: 100% !important;
+}
+
+.chart-box:nth-child(2) {
+    height: 500px;
+}
+*/
+/* ================= TABLE ================= */
 .table-section {
     background: white;
     padding: 20px;
@@ -149,4 +163,15 @@ th {
 
 tr:hover {
     background: #f1faff;
+}
+
+/* ================= RESPONSIVE ================= */
+@media (max-width: 900px) {
+    .charts {
+        grid-template-columns: 1fr; /* stack charts */
+    }
+
+    .cards {
+        grid-template-columns: 1fr;
+    }
 }

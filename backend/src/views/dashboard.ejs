@@ -25,12 +25,12 @@
     <div class="main">
 
         <!-- TOPBAR -->
-        <div class="topbar">
+        <!-- <div class="topbar">
             <div class="search-box">
                 <i class="fas fa-search"></i>
                 <input type="text" placeholder="Search medicines, customers, reports...">
             </div>
-        </div>
+        </div> -->
 
         <!-- DASHBOARD CARDS -->
         <div class="cards">
@@ -49,25 +49,27 @@
                 <p><%= dashboard?.stats?.totalCustomers || 0 %></p>
             </div>
 
-            <div class="card">
+            <!-- <div class="card">
                 <h4>Expired Medicines</h4>
                 <p>0</p>
-            </div>
+            </div> -->
         </div>
 
         <!-- CHARTS SECTION -->
         <div class="charts">
 
-            <!-- ATC PIE CHART -->
             <div class="chart-box">
                 <h3>Sales Distribution (ATC)</h3>
-                <canvas id="pieChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="pieChart"></canvas>
+                </div>
             </div>
 
-            <!-- WEEKLY SALES BAR CHART -->
             <div class="chart-box">
                 <h3>Weekly Sales</h3>
-                <canvas id="barChart"></canvas>
+                <div class="chart-container">
+                    <canvas id="barChart"></canvas>
+                </div>
             </div>
 
         </div>

@@ -186,3 +186,77 @@ exports.checkLowStockNotifications = async () => {
     }
 
 };
+exports.resolveNotification = async (notificationId) => {
+
+    try {
+
+        const id = Number(notificationId);
+
+        // ❗ Edge case: invalid ID
+        if (!id || isNaN(id)) {
+            throw new Error("Invalid notification ID");
+        }
+
+        const result = await repo.resolveNotification(id);
+
+        // ❗ Not found
+        if (result === null) {
+            return {
+                success: false,
+                message: "Notification not found"
+            };
+        }
+
+        // ❗ Already resolved
+        if (result.alreadyResolved) {
+            return {
+                success: true,
+                message: "Already resolved"
+            };
+        }
+
+        return {
+            success: true,
+            message: "Notification resolved successfully"
+        };
+
+    } catch (err) {
+
+        console.error("Service resolve error:", err.message);
+
+        return {
+            success: false,
+            message: "Failed to resolve notification"
+        };
+    }
+
+};
+exports.clearAllNotifications = async () => {
+
+    try {
+
+        const updatedCount = await repo.clearAllNotifications();
+
+        return {
+            success: true,
+            message: `${updatedCount} notifications cleared`
+        };
+
+    } catch (err) {
+
+        console.error("Service clear all error:", err.message);
+
+        return {
+            success: false,
+            message: "Failed to clear notifications"
+        };
+    }
+
+};
+exports.getLowStockNotifications = async () => {
+    return await repo.getLowStockNotifications();
+};
+
+exports.getExpiryNotifications = async () => {
+    return await repo.getExpiryNotifications();
+};

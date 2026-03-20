@@ -1,112 +1,269 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    const notificationBody = document.getElementById("notificationBody");
+    const lowStockBody = document.getElementById("lowStockBody");
+    const expiryBody = document.getElementById("expiryBody");
+
+    const lowStockSection = document.getElementById("lowStockSection");
+    const expirySection = document.getElementById("expirySection");
+
+    const btnLowStock = document.getElementById("showLowStock");
+    const btnExpiry = document.getElementById("showExpiry");
 
     // ===============================
-    // LOAD NOTIFICATIONS
+    // ACTIVE TAB HANDLER (FIXED)
     // ===============================
-    async function loadNotifications() {
+    function setActiveTab(activeBtn) {
 
-    const notificationBody = document.getElementById("notificationBody");
-
-    if (!notificationBody) {
-        console.error("notificationBody missing!");
-        return;
-    }
-
-    try {
-
-        const res = await fetch("/api/notifications", {
-            credentials: "include"
+        document.querySelectorAll(".filter-btn").forEach(btn => {
+            btn.classList.remove("active");   // remove from all
         });
 
-        const result = await res.json();
+        activeBtn.classList.add("active");   // add only to clicked
+    }
 
-        console.log("API RESPONSE:", result);
+    // ===============================
+    // LOAD LOW STOCK
+    // ===============================
+    async function loadLowStock() {
 
-        const notifications = Array.isArray(result) ? result : result.data || [];
+        try {
 
-        notificationBody.innerHTML = "";
+            const res = await fetch("/api/notifications/low-stock", {
+                credentials: "include"
+            });
 
-        if (!notifications.length) {
-            notificationBody.innerHTML = `
-                <tr>
-                    <td colspan="4">No notifications</td>
-                </tr>
-            `;
-            return;
+            const data = await res.json();
+
+            lowStockBody.innerHTML = "";
+
+            if (!data.length) {
+                lowStockBody.innerHTML = `
+                    <tr>
+                        <td colspan="5">No low stock alerts</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            data.forEach(n => {
+
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${n.medicine_name || "-"}</td>
+                    <td>${n.current_stock ?? "-"}</td>
+                    <td>${n.reorder_point ?? "-"}</td>
+                    <td>${n.created_at 
+                        ? new Date(n.created_at).toLocaleString("en-IN") 
+                        : "-"}</td>
+                    <td>
+                        <button class="clear-btn" data-id="${n.notification_id}">
+                            Clear
+                        </button>
+                    </td>
+                `;
+
+                row.classList.add("low-stock-row");
+
+                lowStockBody.appendChild(row);
+            });
+
+        } catch (err) {
+            console.error("Low stock load error:", err);
+        }
+    }
+
+    // ===============================
+    // LOAD EXPIRY
+    // ===============================
+    async function loadExpiry() {
+
+        try {
+
+            const res = await fetch("/api/notifications/expiry", {
+                credentials: "include"
+            });
+
+            const data = await res.json();
+
+            expiryBody.innerHTML = "";
+
+            if (!data.length) {
+                expiryBody.innerHTML = `
+                    <tr>
+                        <td colspan="6">No expiry alerts</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            data.forEach(n => {
+
+                const row = document.createElement("tr");
+
+                row.innerHTML = `
+                    <td>${n.alert_type || "-"}</td>
+                    <td>${n.medicine_name || "-"}</td>
+                    <td>${n.batch_number || "-"}</td>
+                    <td>${n.expiry_date 
+                        ? new Date(n.expiry_date).toLocaleDateString("en-IN") 
+                        : "-"}</td>
+                    <td>${n.created_at 
+                        ? new Date(n.created_at).toLocaleString("en-IN") 
+                        : "-"}</td>
+                    <td>
+                        <button class="clear-btn" data-id="${n.notification_id}">
+                            Clear
+                        </button>
+                    </td>
+                `;
+
+                if (n.alert_type === "Expired") {
+                    row.classList.add("expired-row");
+                } else {
+                    row.classList.add("expiry-risk-row");
+                }
+
+                expiryBody.appendChild(row);
+            });
+
+        } catch (err) {
+            console.error("Expiry load error:", err);
+        }
+    }
+
+    // ===============================
+    // TAB SWITCHING
+    // ===============================
+    btnLowStock.addEventListener("click", () => {
+
+        setActiveTab(btnLowStock);
+
+        lowStockSection.style.display = "block";
+        expirySection.style.display = "none";
+
+        loadLowStock();
+    });
+
+    btnExpiry.addEventListener("click", () => {
+
+        setActiveTab(btnExpiry);
+
+        lowStockSection.style.display = "none";
+        expirySection.style.display = "block";
+
+        loadExpiry();
+    });
+
+    // ===============================
+    // CLEAR SINGLE
+    // ===============================
+    document.addEventListener("click", async (e) => {
+
+        if (e.target.classList.contains("clear-btn")) {
+
+            const id = e.target.dataset.id;
+
+            if (!confirm("Clear this notification?")) return;
+
+            try {
+
+                const res = await fetch(`/api/notifications/${id}/resolve`, {
+                    method: "PATCH",
+                    credentials: "include"
+                });
+
+                const result = await res.json();
+
+                if (!res.ok) {
+                    alert(result.message || "Failed to clear");
+                    return;
+                }
+
+                // reload visible section
+                if (lowStockSection.style.display !== "none") {
+                    loadLowStock();
+                } else {
+                    loadExpiry();
+                }
+
+            } catch (err) {
+                console.error(err);
+            }
+
         }
 
-        notifications.forEach(n => {
-
-            const row = document.createElement("tr");
-
-            row.innerHTML = `
-                <td>${n.alert_type || "-"}</td>
-                <td>${n.medicine_name || "-"}</td>
-                <td>Reorder at ${n.reorder_point}</td>
-                <td>${new Date(n.created_at).toLocaleString()}</td>
-            `;
-
-            notificationBody.appendChild(row);
-        });
-
-    } catch (err) {
-        console.error("Error:", err);
-    }
-}
+    });
 
     // ===============================
-    // CHECK EXPIRY
+    // CLEAR ALL
+    // ===============================
+    document.getElementById("clearAllNotifications")
+        ?.addEventListener("click", async () => {
+
+        if (!confirm("Clear all notifications?")) return;
+
+        try {
+
+            const res = await fetch("/api/notifications/clear-all", {
+                method: "PATCH",
+                credentials: "include"
+            });
+
+            const result = await res.json();
+
+            if (!res.ok) {
+                alert(result.message || "Failed to clear all");
+                return;
+            }
+
+            loadLowStock();
+            loadExpiry();
+
+        } catch (err) {
+            console.error(err);
+        }
+
+    });
+
+    // ===============================
+    // CHECK BUTTONS
     // ===============================
     document.getElementById("checkExpiry").addEventListener("click", async () => {
 
-        try {
+        await fetch("/api/notifications/check-expiry", {
+            method: "POST",
+            credentials: "include"
+        });
 
-            const res = await fetch("/api/notifications/check-expiry", {
-                method: "POST",
-                credentials: "include"
-            });
+        setActiveTab(btnExpiry);
+        lowStockSection.style.display = "none";
+        expirySection.style.display = "block";
 
-            const result = await res.json();
-
-            alert(result.message || "Expiry check done");
-
-            loadNotifications();
-
-        } catch (err) {
-            console.error(err);
-        }
-
+        loadExpiry();
     });
 
-    // ===============================
-    // CHECK STOCK
-    // ===============================
     document.getElementById("checkStock").addEventListener("click", async () => {
 
-        try {
+        await fetch("/api/notifications/check-stock", {
+            method: "POST",
+            credentials: "include"
+        });
 
-            const res = await fetch("/api/notifications/check-stock", {
-                method: "POST",
-                credentials: "include"
-            });
+        setActiveTab(btnLowStock);
+        lowStockSection.style.display = "block";
+        expirySection.style.display = "none";
 
-            const result = await res.json();
-
-            alert(result.message || "Stock check done");
-
-            loadNotifications();
-
-        } catch (err) {
-            console.error(err);
-        }
-
+        loadLowStock();
     });
 
     // ===============================
-    // INITIAL LOAD
+    // INITIAL LOAD (DEFAULT)
     // ===============================
-    loadNotifications();
+    setActiveTab(btnLowStock);   // ✅ only one active
+    lowStockSection.style.display = "block";
+    expirySection.style.display = "none";
+
+    loadLowStock();
 
 });

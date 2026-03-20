@@ -85,6 +85,7 @@ exports.getNotifications = async (type) => {
             "n.created_at",
             "m.name as medicine_name"
         )
+        .where("n.is_resolved", false) // ⭐ ADD THIS
         .orderBy("n.created_at","desc");
 
     if(type){
@@ -92,5 +93,94 @@ exports.getNotifications = async (type) => {
     }
 
     return await query;
+
+};
+
+exports.resolveNotification = async (notificationId) => {
+
+    // ❗ Edge case: invalid ID
+    if (!notificationId) {
+        throw new Error("Invalid notification ID");
+    }
+
+    // Check if notification exists
+    const existing = await knex("notifications")
+        .where({ notification_id: notificationId })
+        .first();
+
+    if (!existing) {
+        return null; // not found
+    }
+
+    // If already resolved → do nothing
+    if (existing.is_resolved) {
+        return { alreadyResolved: true };
+    }
+
+    // Update
+    await knex("notifications")
+        .where({ notification_id: notificationId })
+        .update({
+            is_resolved: true
+        });
+
+    return { success: true };
+};
+
+exports.clearAllNotifications = async () => {
+
+    const updated = await knex("notifications")
+        .where({ is_resolved: false })
+        .update({
+            is_resolved: true
+        });
+
+    return updated; // number of rows updated
+};
+
+exports.getLowStockNotifications = async () => {
+
+    return await knex("notifications as n")
+        .join("medicines as m", "n.medicine_id", "m.medicine_id")
+        .leftJoin("stock_batches as sb", "m.medicine_id", "sb.medicine_id")
+
+        .where("n.alert_type", "Low Stock")
+        .andWhere("n.is_resolved", false)
+
+        .groupBy(
+            "n.notification_id",
+            "m.name",
+            "n.reorder_point",
+            "n.created_at"
+        )
+
+        .select(
+            "n.notification_id",
+            "m.name as medicine_name",
+            "n.reorder_point",
+            "n.created_at",
+
+            // 🔥 THIS IS THE FIX
+            knex.raw("COALESCE(SUM(sb.quantity), 0) as current_stock")
+        )
+
+        .orderBy("n.created_at", "desc");
+};
+exports.getExpiryNotifications = async () => {
+
+    return await knex("notifications as n")
+        .join("medicines as m", "n.medicine_id", "m.medicine_id")
+        .leftJoin("stock_batches as sb", "n.batch_id", "sb.batch_id")
+        .select(
+            "n.notification_id",
+            "n.alert_type",
+            "n.created_at",
+            "m.name as medicine_name",
+            "sb.batch_number",
+            "sb.expiry_date"
+        )
+        .whereIn("n.alert_type", ["Expired", "Expiry Risk"])
+        .andWhere("n.is_resolved", false)
+        .orderBy("n.created_at", "desc");
 
 };

@@ -5,20 +5,113 @@ const controller = require("./supplier.controller");
 const authenticate = require("../../middlewares/auth.middleware");
 const authorizeRoles = require("../../middlewares/role.middleware");
 
-router.post("/", authenticate, authorizeRoles("Owner"), controller.createSupplier);
+// ======================
+// Supplier CRUD
+// ======================
 
-router.get("/", authenticate, controller.getSuppliers);
+// Create supplier
+router.post(
+  "/",
+  authenticate,
+  authorizeRoles("Owner"),
+  controller.createSupplier
+);
 
-router.get("/:id", authenticate, controller.getSupplierById);
+// Get all suppliers
+router.get(
+  "/",
+  authenticate,
+  controller.getSuppliers
+);
 
-router.patch("/:id", authenticate, authorizeRoles("Owner"), controller.updateSupplier);
+// Get supplier by ID
+router.get(
+  "/:id",
+  authenticate,
+  controller.getSupplierById
+);
 
-router.patch("/:id/status", authenticate, authorizeRoles("Owner"), controller.updateSupplierStatus);
+// Update supplier
+router.patch(
+  "/:id",
+  authenticate,
+  authorizeRoles("Owner"),
+  controller.updateSupplier
+);
 
-router.post("/:id/medicines", authenticate, authorizeRoles("Owner","Pharmacist"), controller.addSupplierMedicine);
+// Toggle supplier status
+router.patch(
+  "/:id/status",
+  authenticate,
+  authorizeRoles("Owner"),
+  controller.updateSupplierStatus
+);
 
-router.get("/:id/medicines", authenticate, controller.getSupplierMedicines);
 
-router.get("/:id/orders", authenticate, controller.getSupplierOrders);
+// ======================
+// Supplier ↔ Medicines
+// ======================
+
+// Assign medicine to supplier
+router.post(
+  "/:id/medicines",
+  authenticate,
+  authorizeRoles("Owner", "Pharmacist"),
+  controller.addSupplierMedicine
+);
+
+// Get medicines of supplier
+router.get(
+  "/:id/medicines",
+  authenticate,
+  controller.getSupplierMedicines
+);
+
+// 🔥 NEW: Remove medicine from supplier
+router.delete(
+  "/:id/medicines/:medicineId",
+  authenticate,
+  authorizeRoles("Owner"),
+  controller.removeSupplierMedicine
+);
+
+// 🔥 NEW: Update supplier-medicine details (price, lead time, primary)
+router.patch(
+  "/:id/medicines/:medicineId",
+  authenticate,
+  authorizeRoles("Owner", "Pharmacist"),
+  controller.updateSupplierMedicine
+);
+
+
+// ======================
+// Supplier Orders
+// ======================
+
+// Get supplier orders
+router.get(
+  "/:id/orders",
+  authenticate,
+  controller.getSupplierOrders
+);
+
+
+// ======================
+// 🔥 OPTIONAL (Advanced)
+// ======================
+
+// Get primary supplier for a medicine
+router.get(
+  "/primary/:medicineId",
+  authenticate,
+  controller.getPrimarySupplier
+);
+
+// Get best supplier (based on logic)
+router.get(
+  "/best/:medicineId",
+  authenticate,
+  controller.getBestSupplier
+);
 
 module.exports = router;

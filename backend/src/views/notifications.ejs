@@ -22,25 +22,90 @@
 
         <!-- ACTION BUTTONS -->
         <div class="notification-actions">
-            <button id="checkExpiry">Check Expiry</button>
-            <button id="checkStock">Check Low Stock</button>
+
+            <button id="checkExpiry">
+                <i class="fa-solid fa-clock"></i> Check Expiry
+            </button>
+
+            <button id="checkStock">
+                <i class="fa-solid fa-box"></i> Check Low Stock
+            </button>
+
+            <button id="clearAllNotifications" class="danger-btn">
+                <i class="fa-solid fa-trash"></i> Clear All
+            </button>
+
         </div>
 
-        <!-- NOTIFICATIONS TABLE -->
-        <table class="notification-table">
-            <thead>
-                <tr>
-                    <th>Type</th>
-                    <th>Medicine</th>
-                    <th>Message</th>
-                    <th>Date</th>
-                </tr>
-            </thead>
+        <!-- 🔥 TAB BUTTONS -->
+        <div class="notification-tabs">
+            <button class="filter-btn active" id="showLowStock">
+                Low Stock
+            </button>
 
-            <tbody id="notificationBody">
-                <!-- Filled dynamically -->
-            </tbody>
-        </table>
+            <button class="filter-btn" id="showExpiry">
+                Expiry
+            </button>
+        </div>
+
+        <!-- =============================== -->
+        <!-- 🔵 LOW STOCK TABLE -->
+        <!-- =============================== -->
+        <div id="lowStockSection">
+
+            <div class="notification-section">
+
+                <h3>Low Stock Alerts</h3>
+
+                <table class="notification-table">
+
+                    <thead>
+                        <tr>
+                            <th>Medicine</th>
+                            <th>Current Stock</th>
+                            <th>Reorder Point</th>
+                            <th>Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="lowStockBody"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+        <!-- =============================== -->
+        <!-- 🔴 EXPIRY TABLE -->
+        <!-- =============================== -->
+        <div id="expirySection" style="display:none;">
+
+            <div class="notification-section">
+
+                <h3>Expiry Alerts</h3>
+
+                <table class="notification-table">
+
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Medicine</th>
+                            <th>Batch No</th>
+                            <th>Expiry Date</th>
+                            <th>Created At</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="expiryBody"></tbody>
+
+                </table>
+
+            </div>
+
+        </div>
 
     </div>
 

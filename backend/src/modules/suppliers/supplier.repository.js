@@ -1,6 +1,8 @@
 const db = require("../../config/db");
 
+// ======================
 // Create supplier
+// ======================
 exports.createSupplier = async (data) => {
   const [supplier] = await db("suppliers")
     .insert(data)
@@ -9,44 +11,74 @@ exports.createSupplier = async (data) => {
   return supplier;
 };
 
-// Get all suppliers
+// ======================
+exports.findByName = async (name) => {
+  return db("suppliers")
+    .whereRaw("LOWER(supplier_name) = LOWER(?)", [name])
+    .first();
+};
+
+// ======================
 exports.getSuppliers = async () => {
   return db("suppliers")
     .select("*")
-    .orderBy("supplier_name");
+    .orderBy("supplier_name", "asc");
 };
 
-// Get supplier by ID
+// ======================
 exports.getSupplierById = async (id) => {
   return db("suppliers")
     .where({ supplier_id: id })
     .first();
 };
 
-// Update supplier
+// ======================
 exports.updateSupplier = async (id, data) => {
   return db("suppliers")
     .where({ supplier_id: id })
     .update(data);
 };
 
-// Update supplier status
+// ======================
 exports.updateSupplierStatus = async (id, status) => {
-
   return db("suppliers")
     .where({ supplier_id: id })
     .update({ is_active: status });
-
 };
 
-// Assign medicine to supplier
+// ======================
+exports.getMedicineById = async (medicineId) => {
+  return db("medicines")
+    .where({ medicine_id: medicineId })
+    .first();
+};
+
+// ======================
+exports.getSupplierMedicine = async (supplierId, medicineId) => {
+  return db("medicine_suppliers")
+    .where({
+      supplier_id: supplierId,
+      medicine_id: medicineId
+    })
+    .first();
+};
+
+// ======================
+// 🔥 NEW: Remove existing primary supplier
+// ======================
+exports.clearPrimarySupplier = async (medicineId) => {
+  return db("medicine_suppliers")
+    .where({ medicine_id: medicineId })
+    .update({ is_primary: false });
+};
+
+// ======================
 exports.addSupplierMedicine = async (data) => {
   return db("medicine_suppliers").insert(data);
 };
 
-// Get medicines supplied by supplier
+// ======================
 exports.getSupplierMedicines = async (supplierId) => {
-
   return db("medicine_suppliers as ms")
     .join("medicines as m", "ms.medicine_id", "m.medicine_id")
     .where("ms.supplier_id", supplierId)
@@ -55,13 +87,13 @@ exports.getSupplierMedicines = async (supplierId) => {
       "m.name",
       "m.generic_name",
       "ms.last_purchase_price",
+      "ms.lead_time_days",   // ✅ added
       "ms.is_primary"
     )
     .orderBy("m.name", "asc");
-
 };
 
-// Get purchase orders from supplier
+// ======================
 exports.getSupplierOrders = async (supplierId) => {
   return db("purchase_orders")
     .where({ supplier_id: supplierId })
