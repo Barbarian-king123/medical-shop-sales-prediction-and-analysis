@@ -19,21 +19,34 @@ exports.getMedicines = async ()=>{
 
 
 
-exports.searchMedicines = async (query)=>{
+exports.searchMedicines = async (query) => {
 
-    return await knex("medicines")
-    .whereILike("name",`%${query}%`)
-    .orWhereILike("generic_name",`%${query}%`)
-    .select(
-        "medicine_id",
-        "name",
-        "generic_name",
-        "atc_code"
+  return await knex("medicines as m")
+    .leftJoin("stock_batches as sb", "m.medicine_id", "sb.medicine_id")
+
+    .where(function () {
+      this.whereILike("m.name", `%${query}%`)
+          .orWhereILike("m.generic_name", `%${query}%`);
+    })
+
+    .groupBy(
+      "m.medicine_id",
+      "m.name",
+      "m.generic_name",
+      "m.atc_code"
     )
+
+    .select(
+      "m.medicine_id",
+      "m.name",
+      "m.generic_name",
+      "m.atc_code",
+      knex.raw("COALESCE(SUM(sb.quantity), 0) as total_stock") // ✅ FIX
+    )
+
     .limit(20);
 
 };
-
 
 
 exports.getMedicine = async (medicineId)=>{
@@ -54,5 +67,33 @@ exports.getTotalStock = async (medicineId)=>{
     .first();
 
     return parseInt(result.total || 0);
+
+};
+
+exports.getSafetyStock = async (medicineId) => {
+
+  return await knex("medicines")
+    .where("medicine_id", medicineId)
+    .select("safety_stock")
+    .first();  // 👈 returns single object
+
+};
+exports.getLeadTime = async (medicineId) => {
+
+  return await knex("medicine_suppliers")
+    .where({
+      medicine_id: medicineId,
+      is_primary: true
+    })
+    .select("lead_time_days")
+    .first();
+
+};
+exports.getTargetStockDays = async (medicineId) => {
+
+  return await knex("medicines")
+    .where("medicine_id", medicineId)
+    .select("target_stock_days")
+    .first();
 
 };

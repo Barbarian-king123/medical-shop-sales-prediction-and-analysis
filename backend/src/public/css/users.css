@@ -103,6 +103,7 @@ table thead th{
     color:white;
     padding:14px 16px;
     text-align:left;
+    background:#1e88e5;
 }
 
 /* TABLE BODY */
@@ -121,6 +122,7 @@ table tbody tr:hover{
 }
 
 /* ================= ACTION BUTTONS ================= */
+/* ================= ACTION BUTTONS ================= */
 
 tbody button{
     padding:6px 10px;
@@ -129,36 +131,49 @@ tbody button{
     font-size:12px;
     cursor:pointer;
     margin-right:5px;
+    transition:all 0.2s ease;
 }
 
-/* USERNAME */
+/* ================= VIEW / PRIMARY ================= */
 
 tbody button:nth-child(1){
-    background:#1e88e5;
+    background:#2563eb;   /* modern blue */
     color:white;
 }
 
-/* PASSWORD */
+tbody button:nth-child(1):hover{
+    background:#1e40af;
+}
+
+/* ================= PASSWORD / SECONDARY ================= */
 
 tbody button:nth-child(2){
-    background:#8e24aa;
+    background:#ea0707;   /* neutral gray */
     color:white;
 }
 
-/* ROLE */
+tbody button:nth-child(2):hover{
+    background:#d80404;
+}
+
+/* ================= ROLE / WARNING ================= */
 
 tbody button:nth-child(3){
-    background:#fb8c00;
+    background:#f59e0b;   /* amber */
     color:white;
 }
 
-/* STATUS */
+tbody button:nth-child(3):hover{
+    background:#b45309;
+}
+
+/* ================= STATUS / SUCCESS ================= */
 
 tbody button:nth-child(4){
-    background:#43a047;
+    background:#10b981;   /* modern green */
     color:white;
 }
 
-tbody button:hover{
-    opacity:0.9;
+tbody button:nth-child(4):hover{
+    background:#047857;
 }

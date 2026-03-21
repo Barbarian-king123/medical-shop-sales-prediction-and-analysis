@@ -50,6 +50,18 @@
                     <p class="value" id="safetyStock">-</p>
                 </div>
 
+                <!-- ✅ NEW -->
+                <div class="analysis-card">
+                    <p class="label">Lead Time (Days)</p>
+                    <p class="value" id="leadTime">-</p>
+                </div>
+
+                <!-- ✅ NEW -->
+                <div class="analysis-card">
+                    <p class="label">Target Stock Cycle</p>
+                    <p class="value" id="targetDays">-</p>
+                </div>
+
                 <div class="analysis-card highlight">
                     <p class="label">Suggested Restock</p>
                     <p class="value" id="suggestedRestock">-</p>
@@ -60,7 +72,7 @@
             <!-- Forecast Chart -->
             <div class="chart-container">
 
-                <h3>30 Day Demand Forecast</h3>
+                <h3>Demand Forecast</h3>
 
                 <canvas id="forecastChart"></canvas>
 
@@ -81,6 +93,8 @@
 
 <!-- LOAD CHART LIBRARY FIRST -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script src="/js/analysis-chart.js"></script>
 
 <!-- LOAD ANALYSIS LOGIC -->
 <script src="/js/analysis.js"></script>

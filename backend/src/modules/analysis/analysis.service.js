@@ -39,44 +39,60 @@ exports.getMedicineAnalysis = async (medicineId)=>{
 
 
 
-exports.getForecast = async (medicineId)=>{
+exports.getForecast = async (medicineId) => {
 
     const medicine = await repo.getMedicine(medicineId);
 
-    if(!medicine){
+    if (!medicine) {
         throw new Error("Medicine not found");
     }
 
     const totalStock = await repo.getTotalStock(medicineId);
 
-    const todayDemand = await predictNextDay(medicine.atc_code);
+    const { safety_stock: safetyStock = 0 } =
+        await repo.getSafetyStock(medicineId) || {};
 
-    const forecastResult = await forecast(medicine.atc_code,30);
+    const { lead_time_days: leadTime = 0 } =
+        await repo.getLeadTime(medicineId) || {};
 
-    const safetyStock = 50;
+    // ✅ NEW: get target stock cycle
+    const { target_stock_days: targetDays = 30 } =
+        await repo.getTargetStockDays(medicineId) || {};
+
+    // ✅ total forecast horizon
+    const totalDays = targetDays + leadTime;
+
+    const forecastResult = await forecast(medicine.atc_code, totalDays);
+
+    const todayDemand = forecastResult.daily_forecast[0]?.predicted_sales || 0;
+
+    // ✅ total demand for cycle + lead time
+    const totalDemand = forecastResult.daily_forecast
+        .reduce((sum, day) => sum + day.predicted_sales, 0);
 
     const suggestedRestock = Math.max(
-        forecastResult.restock_quantity + safetyStock - totalStock,
+        totalDemand + safetyStock - totalStock,
         0
     );
 
     return {
-
-        medicineId:medicine.medicine_id,
-        medicineName:medicine.name,
+        medicineId: medicine.medicine_id,
+        medicineName: medicine.name,
 
         todayDemand,
 
-        forecast:forecastResult.daily_forecast,
+        forecast: forecastResult.daily_forecast,
 
-        forecastDemand:forecastResult.restock_quantity,
+        targetDays,   // ✅ NEW
+        leadTime,
+
+        totalDemand,
 
         safetyStock,
 
-        currentStock:totalStock,
+        currentStock: totalStock,
 
         suggestedRestock
-
     };
 
 };

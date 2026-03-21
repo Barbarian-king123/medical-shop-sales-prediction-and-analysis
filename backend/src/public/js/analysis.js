@@ -111,9 +111,7 @@ OPEN ANALYSIS PAGE
 */
 
 function openAnalysis(id) {
-
   window.location.href = `/analysis/medicine/${id}`;
-
 }
 
 
@@ -137,9 +135,7 @@ async function loadAnalysisPage(medicineId) {
 
       credentials: "include",
 
-      body: JSON.stringify({
-        medicineId
-      })
+      body: JSON.stringify({ medicineId })
 
     });
 
@@ -148,18 +144,30 @@ async function loadAnalysisPage(medicineId) {
     }
 
     const result = await res.json();
-
     console.log("Forecast data:", result);
 
     const data = result.data;
 
+    // ✅ Basic info
     document.getElementById("medicineName").innerText = data.medicineName;
-    document.getElementById("currentStock").innerText = data.currentStock;
-    document.getElementById("todayDemand").innerText = data.todayDemand;
+    document.getElementById("currentStock").innerText = Math.round(data.currentStock);
+    document.getElementById("todayDemand").innerText = data.todayDemand.toFixed(2);
     document.getElementById("safetyStock").innerText = data.safetyStock;
-    document.getElementById("suggestedRestock").innerText = data.suggestedRestock;
 
-    drawChart(data.forecast);
+    // ✅ NEW FIELDS
+    if (document.getElementById("leadTime")) {
+      document.getElementById("leadTime").innerText = data.leadTime + " days";
+    }
+
+    if (document.getElementById("targetDays")) {
+      document.getElementById("targetDays").innerText = data.targetDays + " days";
+    }
+
+    // ✅ Suggested Restock (rounded up for real-world usage)
+    document.getElementById("suggestedRestock").innerText =
+      Math.ceil(data.suggestedRestock);
+
+    renderAnalysisChart(data.forecast);
 
     const loading = document.getElementById("loadingSection");
     const content = document.getElementById("analysisContent");
@@ -169,9 +177,7 @@ async function loadAnalysisPage(medicineId) {
 
   }
   catch (err) {
-
     console.error("Analysis loading error:", err);
-
   }
 
 }
@@ -201,11 +207,15 @@ function drawChart(forecast){
     return;
   }
 
-  // extract dates and sales values
+  // ✅ Destroy old chart before creating new one
+  if (chartInstance) {
+    chartInstance.destroy();
+  }
+
   const labels = forecast.map(item => item.date);
   const values = forecast.map(item => item.predicted_sales);
 
-  new Chart(ctx,{
+  chartInstance = new Chart(ctx,{
 
     type:"line",
 

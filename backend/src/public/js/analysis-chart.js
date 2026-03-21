@@ -1,53 +1,91 @@
-document.addEventListener("DOMContentLoaded", function () {
+/*
+====================================
+ANALYSIS CHART (ISOLATED)
+====================================
+*/
 
-    const chartElement = document.getElementById("forecastChart");
+let analysisChartInstance = null;
 
-    if (!chartElement) return;
+function renderAnalysisChart(forecast) {
 
-    const dataElement = document.getElementById("analysisData");
+  const canvas = document.getElementById("forecastChart");
 
-    if (!dataElement) return;
+  if (!canvas) {
+    console.error("Analysis chart canvas not found");
+    return;
+  }
 
-    const analysisData = JSON.parse(dataElement.dataset.analysis || "{}");
+  const ctx = canvas.getContext("2d");
 
-    const forecast = analysisData.forecast || [];
+  if (!forecast || !forecast.length) {
+    console.error("Forecast data missing");
+    return;
+  }
 
-    if (!forecast.length) return;
+  // ✅ Destroy old instance (prevents overlap)
+  if (analysisChartInstance) {
+    analysisChartInstance.destroy();
+  }
 
-    new Chart(chartElement, {
+  const labels = forecast.map(item => item.date);
+  const values = forecast.map(item => item.predicted_sales);
 
-        type: "line",
+  analysisChartInstance = new Chart(ctx, {
 
-        data: {
+  type: "line",
 
-            labels: forecast.map((_, i) => `Day ${i + 1}`),
+  data: {
+    labels: labels,
+    datasets: [{
+      label: "Predicted Demand",
+      data: values,
+      borderColor: "#1e88e5",
+      backgroundColor: "rgba(30,136,229,0.2)",
+      borderWidth: 2,
+      tension: 0.4,
+      fill: true,
+      pointRadius: 3
+    }]
+  },
 
-            datasets: [
-                {
-                    label: "Predicted Demand",
-                    data: forecast,
-                    borderColor: "#1e88e5",
-                    backgroundColor: "rgba(30,136,229,0.2)",
-                    borderWidth: 2,
-                    tension: 0.3,
-                    fill: true
-                }
-            ]
+  options: {
+  responsive: true,
+  maintainAspectRatio: false,
 
-        },
+  layout: {
+    padding: {
+      top: 40,   // 🔥 THIS pushes chart downward
+      bottom: 10
+    }
+  },
 
-        options: {
+  plugins: {
+    legend: {
+      position: "top"
+    }
+  },
 
-            responsive: true,
+  scales: {
+    x: {
+      ticks: {
+        maxTicksLimit: 8,
+        autoSkip: true
+      },
+      grid: {
+        display: false
+      }
+    },
 
-            plugins: {
-                legend: {
-                    display: true
-                }
-            }
-
-        }
-
-    });
+    y: {
+      min: Math.min(...values) - 0.05,
+      max: Math.max(...values) + 0.05,
+      ticks: {
+        stepSize: 0.05
+      }
+    }
+  }
+}
 
 });
+
+}
