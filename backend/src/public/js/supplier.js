@@ -261,7 +261,12 @@ document.addEventListener("input", async function(e){
 
     if(e.target.id === "medicine_name"){
 
-        const term = e.target.value;
+        const input = e.target;
+
+        // ✅ IMPORTANT FIX: reset ID when user types
+        input.dataset.id = "";
+
+        const term = input.value;
 
         if(term.length < 2) return;
 
@@ -281,12 +286,14 @@ document.addEventListener("input", async function(e){
             const item = document.createElement("p");
 
             item.textContent = m.name + " (" + m.generic_name + ")";
-
             item.style.cursor = "pointer";
 
             item.onclick = () => {
-                document.getElementById("medicine_name").value = m.name;
-                document.getElementById("medicine_name").dataset.id = m.medicine_id;
+                input.value = m.name;
+
+                // ✅ SET ID ONLY WHEN USER CLICKS
+                input.dataset.id = m.medicine_id;
+
                 resultDiv.innerHTML = "";
             };
 
@@ -457,3 +464,57 @@ window.loadSupplierOrders = async function(id){
 loadSuppliers();
 
 });
+window.assignMedicine = async function(supplierId){
+
+    const medicineInput = document.getElementById("medicine_name");
+
+    // 🔥 NOW we take value directly as ID
+    const medicineId = medicineInput.value;
+
+    const price = document.getElementById("price").value;
+    const leadTime = document.getElementById("lead_time_days").value;
+    const isPrimary = document.getElementById("is_primary").checked;
+
+    // ❗ VALIDATION
+    if(!medicineId || isNaN(medicineId)){
+        alert("Please enter a valid Medicine ID");
+        return;
+    }
+
+    try {
+
+        const res = await fetch(`/api/suppliers/${supplierId}/medicines`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            credentials: "include",
+            body: JSON.stringify({
+
+                medicine_id: Number(medicineId),
+                last_purchase_price: price ? Number(price) : null,
+                lead_time_days: leadTime ? Number(leadTime) : 3,
+                is_primary: isPrimary
+
+            })
+        });
+
+        const result = await res.json();
+
+        if(!res.ok){
+            alert(result.message || "Failed to assign medicine");
+            return;
+        }
+
+        alert("Medicine assigned successfully");
+
+        // clear form
+        medicineInput.value = "";
+        document.getElementById("price").value = "";
+        document.getElementById("lead_time_days").value = 3;
+        document.getElementById("is_primary").checked = false;
+
+    } catch(err){
+        console.error("Assign medicine error:", err);
+    }
+};

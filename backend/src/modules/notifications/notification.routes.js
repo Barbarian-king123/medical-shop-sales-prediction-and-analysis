@@ -3,30 +3,38 @@ const controller = require("./notification.controller");
 
 const router = express.Router();
 
-// ===============================
-// GET NOTIFICATIONS
-// ===============================
+/* =============================== */
+/* GET NOTIFICATIONS */
+/* =============================== */
 router.get("/", controller.getNotifications);
 
-// ===============================
-// RUN CHECKS
-// ===============================
+/* =============================== */
+/* RUN CHECKS */
+/* =============================== */
+
+// 🔥 Run both (recommended main endpoint)
+router.post("/run-all", controller.runAllChecks);
+
+// Individual checks (optional)
 router.post("/check-expiry", controller.runExpiryCheck);
 router.post("/check-stock", controller.runStockCheck);
 
-// ===============================
-// NEW ROUTES (IMPORTANT)
-// ===============================
+/* =============================== */
+/* SPECIFIC FETCH ROUTES */
+/* =============================== */
 
-// Resolve single notification
-router.patch("/:id/resolve", controller.resolveNotification);
+// ⚠️ IMPORTANT: place these BEFORE :id route
+router.get("/low-stock", controller.getLowStockNotifications);
+router.get("/expiry", controller.getExpiryNotifications);
+
+/* =============================== */
+/* ACTION ROUTES */
+/* =============================== */
 
 // Clear all notifications
 router.patch("/clear-all", controller.clearAllNotifications);
-// NEW ROUTES
 
-router.get("/low-stock", controller.getLowStockNotifications);
-
-router.get("/expiry", controller.getExpiryNotifications);
+// Resolve single notification
+router.patch("/:id/resolve", controller.resolveNotification);
 
 module.exports = router;

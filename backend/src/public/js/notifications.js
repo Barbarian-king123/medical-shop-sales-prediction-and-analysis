@@ -1,3 +1,66 @@
+
+/* =============================== */
+/* CHECK EXPIRY */
+/* =============================== */
+document.getElementById("checkExpiry")
+    ?.addEventListener("click", async () => {
+
+    try {
+
+        const res = await fetch("/api/notifications/check-expiry", {
+            method: "POST",
+            credentials: "include"
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+            alert(result.message || "Failed to check expiry");
+            return;
+        }
+
+        alert("Expiry notifications updated");
+
+        // reload expiry tab
+        loadExpiry();
+
+    } catch (err) {
+        console.error("Expiry check error:", err);
+    }
+
+});
+
+
+/* =============================== */
+/* CHECK LOW STOCK */
+/* =============================== */
+document.getElementById("checkStock")
+    ?.addEventListener("click", async () => {
+
+    try {
+
+        const res = await fetch("/api/notifications/check-stock", {
+            method: "POST",
+            credentials: "include"
+        });
+
+        const result = await res.json();
+
+        if (!res.ok) {
+            alert(result.message || "Failed to check stock");
+            return;
+        }
+
+        alert("Low stock notifications updated");
+
+        // reload low stock tab
+        loadLowStock();
+
+    } catch (err) {
+        console.error("Stock check error:", err);
+    }
+
+});
 document.addEventListener("DOMContentLoaded", function () {
 
     const lowStockBody = document.getElementById("lowStockBody");
@@ -9,22 +72,28 @@ document.addEventListener("DOMContentLoaded", function () {
     const btnLowStock = document.getElementById("showLowStock");
     const btnExpiry = document.getElementById("showExpiry");
 
-    // ===============================
-    // ACTIVE TAB HANDLER (FIXED)
-    // ===============================
+    /* =============================== */
+    /* ACTIVE TAB */
+    /* =============================== */
     function setActiveTab(activeBtn) {
-
         document.querySelectorAll(".filter-btn").forEach(btn => {
-            btn.classList.remove("active");   // remove from all
+            btn.classList.remove("active");
         });
-
-        activeBtn.classList.add("active");   // add only to clicked
+        activeBtn.classList.add("active");
     }
 
-    // ===============================
-    // LOAD LOW STOCK
-    // ===============================
+    function isLowStockActive() {
+        return btnLowStock.classList.contains("active");
+    }
+
+    /* =============================== */
+    /* LOAD LOW STOCK */
+    /* =============================== */
     async function loadLowStock() {
+
+        lowStockBody.innerHTML = `
+            <tr><td colspan="5">Loading...</td></tr>
+        `;
 
         try {
 
@@ -34,13 +103,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const data = await res.json();
 
+            if (!res.ok) throw new Error(data.message);
+
             lowStockBody.innerHTML = "";
 
             if (!data.length) {
                 lowStockBody.innerHTML = `
-                    <tr>
-                        <td colspan="5">No low stock alerts</td>
-                    </tr>
+                    <tr><td colspan="5">No low stock alerts</td></tr>
                 `;
                 return;
             }
@@ -64,19 +133,26 @@ document.addEventListener("DOMContentLoaded", function () {
                 `;
 
                 row.classList.add("low-stock-row");
-
                 lowStockBody.appendChild(row);
             });
 
         } catch (err) {
             console.error("Low stock load error:", err);
+
+            lowStockBody.innerHTML = `
+                <tr><td colspan="5">Failed to load data</td></tr>
+            `;
         }
     }
 
-    // ===============================
-    // LOAD EXPIRY
-    // ===============================
+    /* =============================== */
+    /* LOAD EXPIRY */
+    /* =============================== */
     async function loadExpiry() {
+
+        expiryBody.innerHTML = `
+            <tr><td colspan="6">Loading...</td></tr>
+        `;
 
         try {
 
@@ -86,13 +162,13 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const data = await res.json();
 
+            if (!res.ok) throw new Error(data.message);
+
             expiryBody.innerHTML = "";
 
             if (!data.length) {
                 expiryBody.innerHTML = `
-                    <tr>
-                        <td colspan="6">No expiry alerts</td>
-                    </tr>
+                    <tr><td colspan="6">No expiry alerts</td></tr>
                 `;
                 return;
             }
@@ -129,35 +205,33 @@ document.addEventListener("DOMContentLoaded", function () {
 
         } catch (err) {
             console.error("Expiry load error:", err);
+
+            expiryBody.innerHTML = `
+                <tr><td colspan="6">Failed to load data</td></tr>
+            `;
         }
     }
 
-    // ===============================
-    // TAB SWITCHING
-    // ===============================
+    /* =============================== */
+    /* TAB SWITCHING */
+    /* =============================== */
     btnLowStock.addEventListener("click", () => {
-
         setActiveTab(btnLowStock);
-
         lowStockSection.style.display = "block";
         expirySection.style.display = "none";
-
         loadLowStock();
     });
 
     btnExpiry.addEventListener("click", () => {
-
         setActiveTab(btnExpiry);
-
         lowStockSection.style.display = "none";
         expirySection.style.display = "block";
-
         loadExpiry();
     });
 
-    // ===============================
-    // CLEAR SINGLE
-    // ===============================
+    /* =============================== */
+    /* CLEAR SINGLE */
+    /* =============================== */
     document.addEventListener("click", async (e) => {
 
         if (e.target.classList.contains("clear-btn")) {
@@ -165,6 +239,8 @@ document.addEventListener("DOMContentLoaded", function () {
             const id = e.target.dataset.id;
 
             if (!confirm("Clear this notification?")) return;
+
+            e.target.disabled = true;
 
             try {
 
@@ -180,8 +256,7 @@ document.addEventListener("DOMContentLoaded", function () {
                     return;
                 }
 
-                // reload visible section
-                if (lowStockSection.style.display !== "none") {
+                if (isLowStockActive()) {
                     loadLowStock();
                 } else {
                     loadExpiry();
@@ -195,9 +270,9 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 
-    // ===============================
-    // CLEAR ALL
-    // ===============================
+    /* =============================== */
+    /* CLEAR ALL */
+    /* =============================== */
     document.getElementById("clearAllNotifications")
         ?.addEventListener("click", async () => {
 
@@ -226,41 +301,56 @@ document.addEventListener("DOMContentLoaded", function () {
 
     });
 
-    // ===============================
-    // CHECK BUTTONS
-    // ===============================
-    document.getElementById("checkExpiry").addEventListener("click", async () => {
+    /* =============================== */
+    /* RUN ALL CHECKS 🔥 */
+    /* =============================== */
+    document.getElementById("checkAll")?.addEventListener("click", async () => {
 
-        await fetch("/api/notifications/check-expiry", {
-            method: "POST",
-            credentials: "include"
-        });
+        try {
 
-        setActiveTab(btnExpiry);
-        lowStockSection.style.display = "none";
-        expirySection.style.display = "block";
+            const res = await fetch("/api/notifications/run-all", {
+                method: "POST",
+                credentials: "include"
+            });
 
-        loadExpiry();
+            const result = await res.json();
+
+            if (!res.ok) {
+                alert(result.message || "Failed to generate notifications");
+                return;
+            }
+
+            alert("Notifications updated");
+
+            if (isLowStockActive()) {
+                loadLowStock();
+            } else {
+                loadExpiry();
+            }
+
+        } catch (err) {
+            console.error(err);
+        }
+
     });
 
-    document.getElementById("checkStock").addEventListener("click", async () => {
+    /* =============================== */
+    /* AUTO REFRESH 🔥 */
+    /* =============================== */
+    setInterval(() => {
 
-        await fetch("/api/notifications/check-stock", {
-            method: "POST",
-            credentials: "include"
-        });
+        if (isLowStockActive()) {
+            loadLowStock();
+        } else {
+            loadExpiry();
+        }
 
-        setActiveTab(btnLowStock);
-        lowStockSection.style.display = "block";
-        expirySection.style.display = "none";
+    }, 30000);
 
-        loadLowStock();
-    });
-
-    // ===============================
-    // INITIAL LOAD (DEFAULT)
-    // ===============================
-    setActiveTab(btnLowStock);   // ✅ only one active
+    /* =============================== */
+    /* INITIAL LOAD */
+    /* =============================== */
+    setActiveTab(btnLowStock);
     lowStockSection.style.display = "block";
     expirySection.style.display = "none";
 

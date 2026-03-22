@@ -1,113 +1,90 @@
 const repo = require("./notification.repository");
 const { forecast } = require("../../services/mlService");
 
+/* ================= GET ================= */
+
 exports.getNotifications = async (type) => {
     return await repo.getNotifications(type);
 };
 
-
+/* ================= EXPIRY ================= */
 
 exports.checkExpiryNotifications = async () => {
 
+    // 🔥 1. EXPIRED
     const expired = await repo.getExpiredBatches();
 
     for (const batch of expired) {
 
-        const exists = await repo.notificationExists(
-            batch.medicine_id,
-            "Expired"
-        );
+        await repo.insertNotification({
+            medicine_id: batch.medicine_id,
+            batch_id: batch.batch_id,
+            alert_type: "Expired",
+            is_resolved: false,
+            created_at: new Date()
+        });
 
-        if (!exists) {
+        await repo.markExpiredAlertSent(batch.batch_id);
 
-            await repo.insertNotification({
-                medicine_id: batch.medicine_id,
-                batch_id: batch.batch_id,
-                alert_type: "Expired",
-                created_at: new Date()
-            });
-
-            console.log("Expired notification created for batch", batch.batch_id);
-        }
+        console.log("✅ Expired notification created:", batch.batch_id);
     }
 
-
+    // ⚠️ 2. EXPIRY RISK
     const expiryRisk = await repo.getExpiryRiskBatches();
 
     for (const batch of expiryRisk) {
 
-        const exists = await repo.notificationExists(
-            batch.medicine_id,
-            "Expiry Risk"
-        );
+        await repo.insertNotification({
+            medicine_id: batch.medicine_id,
+            batch_id: batch.batch_id,
+            alert_type: "Expiry Risk",
+            is_resolved: false,
+            created_at: new Date()
+        });
 
-        if (!exists) {
+        await repo.markExpiryRiskAlertSent(batch.batch_id);
 
-            await repo.insertNotification({
-                medicine_id: batch.medicine_id,
-                batch_id: batch.batch_id,
-                alert_type: "Expiry Risk",
-                created_at: new Date()
-            });
-
-            console.log("Expiry risk notification created for batch", batch.batch_id);
-        }
+        console.log("⚠️ Expiry risk notification created:", batch.batch_id);
     }
-
 };
 
-
-
+/* ================= LOW STOCK ================= */
 
 exports.checkLowStockNotifications = async () => {
 
-    const medicines = await repo.getAllMedicines();
+    // 🔥 NEW: batch-level instead of medicine-level
+    const batches = await repo.getLowStockBatches();
 
-    for (const medicine of medicines) {
+    for (const batch of batches) {
 
-        console.log("Processing medicine:", medicine.name);
+        const medicine = await repo.getAllMedicines()
+            .then(meds => meds.find(m => m.medicine_id === batch.medicine_id));
 
-        if (!medicine.atc_code) {
-            console.log("Skipping medicine without ATC:", medicine.name);
+        if (!medicine || !medicine.atc_code) {
+            console.log("Skipping batch without ATC:", batch.batch_id);
             continue;
         }
 
-        const supplier = await repo.getPrimarySupplier(
-            medicine.medicine_id
-        );
+        const supplier = await repo.getPrimarySupplier(batch.medicine_id);
 
         if (!supplier) {
-            console.log("No primary supplier for", medicine.name);
+            console.log("No supplier for batch:", batch.batch_id);
             continue;
         }
 
         const leadTime = Number(supplier.lead_time_days) || 3;
 
-        const currentStock = Number(
-            await repo.getTotalStock(medicine.medicine_id)
-        ) || 0;
-
         let forecastResult;
 
         try {
-
             forecastResult = await forecast(
                 medicine.atc_code,
                 leadTime
             );
-
         } catch (err) {
-
-            console.error(
-                "ML Forecast failed for",
-                medicine.atc_code,
-                err.message
-            );
-
+            console.error("Forecast failed:", err.message);
             continue;
         }
-
-        console.log("Forecast Result:", forecastResult);
 
         const predictedDemand = Number(
             forecastResult?.restock_quantity
@@ -115,91 +92,56 @@ exports.checkLowStockNotifications = async () => {
 
         const safetyStock = Number(medicine.safety_stock) || 20;
 
-        // FIX: reorder point must be integer
         const reorderPoint = Math.ceil(
             predictedDemand + safetyStock
         );
 
-        console.log({
-            medicine: medicine.name,
-            leadTime,
-            currentStock,
-            predictedDemand,
-            safetyStock,
-            reorderPoint
-        });
+        if (batch.quantity < reorderPoint) {
 
-        if (currentStock < reorderPoint) {
-
-            const exists = await repo.notificationExists(
-                medicine.medicine_id,
-                "Low Stock"
-            );
-
-            if (exists) {
-                console.log("Notification already exists for", medicine.name);
-                continue;
-            }
-
-            // FIX: suggested quantity must be integer
             const suggestedQuantity = Math.ceil(
-                Math.max(reorderPoint - currentStock, 0)
+                Math.max(reorderPoint - batch.quantity, 0)
             );
 
-            try {
+            await repo.insertNotification({
+                medicine_id: batch.medicine_id,
+                batch_id: batch.batch_id, // 🔥 IMPORTANT
+                supplier_id: supplier.supplier_id,
+                alert_type: "Low Stock",
+                predicted_daily_velocity: predictedDemand,
+                reorder_point: reorderPoint,
+                suggested_quantity: suggestedQuantity,
+                is_resolved: false,
+                created_at: new Date()
+            });
 
-                await repo.insertNotification({
+            await repo.markLowStockAlertSent(batch.batch_id);
 
-                    medicine_id: medicine.medicine_id,
-                    supplier_id: supplier.supplier_id,
-                    alert_type: "Low Stock",
-                    predicted_daily_velocity: predictedDemand,
-                    reorder_point: reorderPoint,
-                    suggested_quantity: suggestedQuantity,
-                    created_at: new Date()
-
-                });
-
-                console.log(
-                    "Low stock notification created for",
-                    medicine.name
-                );
-
-            } catch (err) {
-
-                console.error(
-                    "Failed inserting notification:",
-                    err.message
-                );
-
-            }
+            console.log("📉 Low stock notification created:", batch.batch_id);
 
         } else {
 
-            console.log(
-                "Stock sufficient for",
-                medicine.name
-            );
+            // 🔁 RESET FLAG (important)
+            await repo.resetLowStockFlag(batch.batch_id);
 
+            console.log("✅ Stock OK, flag reset:", batch.batch_id);
         }
-
     }
-
 };
+
+/* ================= RESOLVE ================= */
+
 exports.resolveNotification = async (notificationId) => {
 
     try {
 
         const id = Number(notificationId);
 
-        // ❗ Edge case: invalid ID
         if (!id || isNaN(id)) {
             throw new Error("Invalid notification ID");
         }
 
         const result = await repo.resolveNotification(id);
 
-        // ❗ Not found
         if (result === null) {
             return {
                 success: false,
@@ -207,7 +149,6 @@ exports.resolveNotification = async (notificationId) => {
             };
         }
 
-        // ❗ Already resolved
         if (result.alreadyResolved) {
             return {
                 success: true,
@@ -222,15 +163,17 @@ exports.resolveNotification = async (notificationId) => {
 
     } catch (err) {
 
-        console.error("Service resolve error:", err.message);
+        console.error("Resolve error:", err.message);
 
         return {
             success: false,
             message: "Failed to resolve notification"
         };
     }
-
 };
+
+/* ================= CLEAR ================= */
+
 exports.clearAllNotifications = async () => {
 
     try {
@@ -244,15 +187,17 @@ exports.clearAllNotifications = async () => {
 
     } catch (err) {
 
-        console.error("Service clear all error:", err.message);
+        console.error("Clear all error:", err.message);
 
         return {
             success: false,
             message: "Failed to clear notifications"
         };
     }
-
 };
+
+/* ================= FETCH ================= */
+
 exports.getLowStockNotifications = async () => {
     return await repo.getLowStockNotifications();
 };
