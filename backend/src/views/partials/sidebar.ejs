@@ -3,6 +3,7 @@
 
     <ul class="menu">
 
+        <!-- ✅ Common for ALL -->
         <li class="<%= activePage === 'dashboard' ? 'active' : '' %>">
             <a href="/dashboard">
                 <i class="fas fa-chart-line"></i>
@@ -17,6 +18,7 @@
             </a>
         </li>
 
+        <!-- ✅ Pharmacist + Owner -->
         <% if (user && (user.role === "Owner" || user.role === "Pharmacist")) { %>
 
         <li class="<%= activePage === 'inventory' ? 'active' : '' %>">
@@ -42,6 +44,7 @@
 
         <% } %>
 
+        <!-- ✅ Only Owner -->
         <% if (user && user.role === "Owner") { %>
 
         <li class="<%= activePage === 'notifications' ? 'active' : '' %>">
@@ -58,9 +61,18 @@
             </a>
         </li>
 
+        <!-- ✅ Only Owner -->
+        <li class="<%= activePage === 'users' ? 'active' : '' %>">
+            <a href="/users">
+                <i class="fas fa-users"></i>
+                <span>User Management</span>
+            </a>
+        </li>
+
         <% } %>
 
-        <% if (user && user.role !== "Staff") { %>
+        <!-- ✅ Pharmacist + Owner (NOT Staff) -->
+        <% if (user && user.role === "Owner") { %>
 
         <li class="<%= activePage === 'sales' ? 'active' : '' %>">
             <a href="/sales">
@@ -70,14 +82,8 @@
         </li>
 
         <% } %>
-        
-        <li class="<%= activePage === 'users' ? 'active' : '' %>">
-        <a href="/users">
-        <i class="fas fa-users"></i>
-        <span>User Management</span>
-        </a>
-        </li>
 
+        <!-- ✅ Common -->
         <li class="<%= activePage === 'profile' ? 'active' : '' %>">
             <a href="/profile">
                 <i class="fas fa-user"></i>

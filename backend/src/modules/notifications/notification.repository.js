@@ -52,18 +52,22 @@ exports.getExpiredBatches = async () => {
 };
 
 // 🔥 Low Stock (NEW)
-exports.getLowStockBatches = async () => {
-    return await knex("stock_batches as sb")
-        .join("medicines as m", "sb.medicine_id", "m.medicine_id")
-        .select(
-            "sb.batch_id",
-            "sb.medicine_id",
-            "sb.quantity",
-            "m.safety_stock",
-            "m.name"
+exports.getMedicinesWithStock = async () => {
+    return await knex("medicines as m")
+        .leftJoin("stock_batches as sb", "m.medicine_id", "sb.medicine_id")
+        .groupBy(
+            "m.medicine_id",
+            "m.name",
+            "m.atc_code",
+            "m.safety_stock"
         )
-        .whereRaw("sb.quantity < m.safety_stock")
-        .andWhere("sb.low_stock_alert_sent", false);
+        .select(
+            "m.medicine_id",
+            "m.name",
+            "m.atc_code",
+            "m.safety_stock",
+            knex.raw("COALESCE(SUM(sb.quantity), 0) as total_stock")
+        );
 };
 
 /* ================= NOTIFICATIONS ================= */
@@ -214,4 +218,14 @@ exports.getExpiryNotifications = async () => {
         .whereIn("n.alert_type", ["Expired", "Expiry Risk"])
         .andWhere("n.is_resolved", false)
         .orderBy("n.created_at", "desc");
+};
+
+exports.getExistingLowStockNotification = async (medicineId) => {
+    return await knex("notifications")
+        .where({
+            medicine_id: medicineId,
+            alert_type: "Low Stock",
+            is_resolved: false
+        })
+        .first();
 };

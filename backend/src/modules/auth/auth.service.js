@@ -4,13 +4,17 @@ const AppError = require("../../utils/AppError");
 const repo = require("./auth.repository");
 
 exports.register = async ({ username, password, role }) => {
-  if (!username || !password || !role) {
-    throw new AppError("Username, password and role required", 400);
+  if (!username || !password) {
+    throw new AppError("Username and password required", 400);
   }
 
   const allowedRoles = ["Owner", "Pharmacist", "Staff"];
 
-  if (!allowedRoles.includes(role)) {
+  // 👉 Set default role if not provided
+  const finalRole = role || "Staff";
+
+  // 👉 Validate role
+  if (!allowedRoles.includes(finalRole)) {
     throw new AppError("Invalid role selected", 400);
   }
 
@@ -25,7 +29,7 @@ exports.register = async ({ username, password, role }) => {
   const user = await repo.createUser({
     username,
     password_hash: hashedPassword,
-    role,
+    role: finalRole, // 👉 use finalRole instead of role
   });
 
   return {

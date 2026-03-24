@@ -9,7 +9,7 @@ const authorizeRoles = require("../../middlewares/role.middleware");
 router.post(
   "/",
   authenticate,
-  authorizeRoles("Owner"),
+  authorizeRoles("Owner","Pharmacist"),
   controller.createMedicine
 );
 

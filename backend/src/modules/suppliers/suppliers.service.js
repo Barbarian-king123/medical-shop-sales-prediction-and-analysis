@@ -75,13 +75,26 @@ exports.updateSupplierStatus = async (id) => {
 exports.addSupplierMedicine = async (supplierId, data) => {
 
   if (!supplierId) throw new AppError("Supplier ID required", 400);
-  if (!data.medicine_id) throw new AppError("Medicine ID required", 400);
+
+  // ✅ NEW
+  if (!data.medicine_name || data.medicine_name.trim() === "") {
+    throw new AppError("Medicine name required", 400);
+  }
 
   const supplier = await repo.getSupplierById(supplierId);
   if (!supplier) throw new AppError("Supplier not found", 404);
 
-  const medicine = await repo.getMedicineById(data.medicine_id);
-  if (!medicine) throw new AppError("Medicine not found", 404);
+  // 🔍 Convert name → ID
+  const medicine = await repo.getMedicineByName(data.medicine_name);
+
+  if (!medicine) {
+    throw new AppError(
+      `Medicine '${data.medicine_name}' not found`,
+      404
+    );
+  }
+
+  data.medicine_id = medicine.medicine_id;
 
   const existing = await repo.getSupplierMedicine(
     supplierId,
@@ -92,12 +105,10 @@ exports.addSupplierMedicine = async (supplierId, data) => {
     throw new AppError("Medicine already assigned to this supplier", 409);
   }
 
-  // 🔥 Validate lead time
   if (data.lead_time_days && data.lead_time_days < 0) {
     throw new AppError("Lead time must be positive", 400);
   }
 
-  // 🔥 PRIMARY SUPPLIER LOGIC
   if (data.is_primary) {
     await repo.clearPrimarySupplier(data.medicine_id);
   }

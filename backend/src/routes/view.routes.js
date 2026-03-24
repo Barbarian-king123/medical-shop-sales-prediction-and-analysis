@@ -129,7 +129,7 @@ router.get("/inventory/movements/:medicineId", verifyViewToken, (req, res) => {
 // =====================
 router.get("/inventory/restock/:medicineId", verifyViewToken, (req, res) => {
 
-  if (req.user.role !== "Owner") {
+  if (req.user.role === "Staff") {
     return res.redirect("/dashboard?error=Access denied");
   }
 
@@ -162,7 +162,7 @@ router.get("/inventory/adjust/:batchId", verifyViewToken, (req, res) => {
 // Add Medicine (Owner Only)
 // =====================
 router.get("/add-medicine", verifyViewToken, (req, res) => {
-  if (req.user.role !== "Owner") {
+  if (req.user.role === "Staff") {
     return res.redirect("/dashboard?error=Access denied");
   }
 

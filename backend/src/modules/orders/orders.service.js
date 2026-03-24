@@ -23,7 +23,6 @@ exports.getOrders = async (status) => {
   }
 
   return repo.getOrders();
-
 };
 
 exports.getOrderById = async (orderId) => {
@@ -35,7 +34,6 @@ exports.getOrderById = async (orderId) => {
   }
 
   return order;
-
 };
 
 exports.receiveOrder = async (orderId, batches) => {
@@ -66,9 +64,26 @@ exports.receiveOrder = async (orderId, batches) => {
 
     for (const batch of batches) {
 
-      if (!batch.medicine_id) {
-        throw new AppError("Medicine ID required", 400);
+      // 🔥 NEW: Accept medicine_name instead of ID
+      if (!batch.medicine_name) {
+        throw new AppError("Medicine name required", 400);
       }
+
+      // 🔍 Convert name → ID (case-insensitive)
+      const medicine = await repo.getMedicineByName(
+        trx,
+        batch.medicine_name
+      );
+
+      if (!medicine) {
+        throw new AppError(
+          `Medicine '${batch.medicine_name}' not found`,
+          404
+        );
+      }
+
+      // ✅ Inject ID for further logic
+      batch.medicine_id = medicine.medicine_id;
 
       if (!batch.batch_number) {
         throw new AppError("Batch number required", 400);
@@ -82,6 +97,7 @@ exports.receiveOrder = async (orderId, batches) => {
         throw new AppError("Expiry date must be after manufacturing date", 400);
       }
 
+      // ✅ Validate medicine belongs to order
       const orderItem = await repo.getOrderItem(
         trx,
         orderId,
@@ -90,7 +106,7 @@ exports.receiveOrder = async (orderId, batches) => {
 
       if (!orderItem) {
         throw new AppError(
-          `Medicine ${batch.medicine_id} not part of this order`,
+          `Medicine '${batch.medicine_name}' not part of this order`,
           400
         );
       }
@@ -159,7 +175,6 @@ exports.receiveOrder = async (orderId, batches) => {
         fullyReceived = false;
         break;
       }
-
     }
 
     if (fullyReceived) {
@@ -171,7 +186,6 @@ exports.receiveOrder = async (orderId, batches) => {
     return { message: "Order received successfully" };
 
   });
-
 };
 
 exports.cancelOrder = async (orderId) => {
@@ -206,5 +220,4 @@ exports.cancelOrder = async (orderId) => {
   return {
     message: "Order cancelled successfully"
   };
-
 };

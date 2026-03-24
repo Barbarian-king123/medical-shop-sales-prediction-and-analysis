@@ -138,3 +138,8 @@ exports.getOrderItems = async (trx, orderId) => {
     .where({ po_id: orderId });
 
 };
+exports.getMedicineByName = async (trx, name) => {
+  return trx("medicines")
+    .whereRaw("LOWER(name) = LOWER(?)", [name])
+    .first();
+};

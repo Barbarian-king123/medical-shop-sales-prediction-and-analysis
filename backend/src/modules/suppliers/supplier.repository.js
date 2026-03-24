@@ -100,3 +100,9 @@ exports.getSupplierOrders = async (supplierId) => {
     .select("po_id", "order_date", "status")
     .orderBy("order_date", "desc");
 };
+// 🔥 NEW: Get medicine by name (case-insensitive)
+exports.getMedicineByName = async (name) => {
+  return db("medicines")
+    .whereRaw("LOWER(TRIM(name)) = LOWER(TRIM(?))", [name])
+    .first();
+};

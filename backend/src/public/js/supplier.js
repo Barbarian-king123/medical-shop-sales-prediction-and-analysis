@@ -11,7 +11,6 @@ const formContainer = document.getElementById("supplierFormContainer");
 // Toggle Form
 // ======================
 toggleBtn.addEventListener("click", () => {
-
     if (formContainer.style.display === "none") {
         formContainer.style.display = "block";
         toggleBtn.textContent = "- Hide Supplier Form";
@@ -19,27 +18,20 @@ toggleBtn.addEventListener("click", () => {
         formContainer.style.display = "none";
         toggleBtn.textContent = "+ Add Supplier";
     }
-
 });
 
 // ======================
 // Load Suppliers
 // ======================
 async function loadSuppliers() {
-
     try {
-
-        const res = await fetch("/api/suppliers", {
-            credentials: "include"
-        });
-
+        const res = await fetch("/api/suppliers", { credentials: "include" });
         const result = await res.json();
         const suppliers = result.data || result.suppliers || [];
 
         table.innerHTML = "";
 
         suppliers.forEach(supplier => {
-
             const row = document.createElement("tr");
 
             row.innerHTML = `
@@ -54,20 +46,17 @@ async function loadSuppliers() {
             `;
 
             table.appendChild(row);
-
         });
 
     } catch(err) {
-        console.error("Load suppliers error:", err);
+        console.error(err);
     }
-
 }
 
 // ======================
 // Create Supplier
 // ======================
 form.addEventListener("submit", async function(e){
-
     e.preventDefault();
 
     const supplier_name = document.getElementById("supplier_name").value;
@@ -78,15 +67,10 @@ form.addEventListener("submit", async function(e){
     const gst_number = document.getElementById("gst_number").value;
 
     try {
-
         const res = await fetch("/api/suppliers", {
-
             method: "POST",
-            headers: {
-                "Content-Type":"application/json"
-            },
+            headers: { "Content-Type":"application/json" },
             credentials:"include",
-
             body: JSON.stringify({
                 supplier_name,
                 phone,
@@ -95,34 +79,29 @@ form.addEventListener("submit", async function(e){
                 address,
                 gst_number
             })
-
         });
 
         const result = await res.json();
 
         if(!res.ok){
-            alert(result.message || "Failed to create supplier");
+            alert(result.message);
             return;
         }
 
         alert("Supplier created");
-
         form.reset();
         loadSuppliers();
 
     } catch(err){
-        console.error("Create supplier error:", err);
+        console.error(err);
     }
-
 });
 
 // ======================
 // Toggle Status
 // ======================
 window.toggleStatus = async function(id){
-
     try {
-
         const res = await fetch(`/api/suppliers/${id}/status`,{
             method:"PATCH",
             credentials:"include"
@@ -131,20 +110,25 @@ window.toggleStatus = async function(id){
         const result = await res.json();
 
         if(!res.ok){
-            alert(result.message || "Status update failed");
+            alert(result.message);
             return;
         }
 
         loadSuppliers();
 
     } catch(err){
-        console.error("Toggle status error:", err);
+        console.error(err);
     }
-
 };
 
 // ======================
-// View Supplier Details
+// GLOBAL STATE
+// ======================
+let currentSupplierId = null;
+let currentSupplierData = null;
+
+// ======================
+// RENDER DETAILS (KEY FIX)
 // ======================
 function renderSupplierDetails(supplier){
 
@@ -162,24 +146,27 @@ function renderSupplierDetails(supplier){
         <p><b>Address:</b> ${supplier.address || "-"}</p>
         <p><b>GST:</b> ${supplier.gst_number || "-"}</p>
 
-        <button onclick="toggleAssignMedicineForm(${supplier.supplier_id})">
-            Assign Medicine
-        </button>
+        <div style="margin-top:10px;">
+            <button onclick="toggleAssignMedicineForm(${supplier.supplier_id})">
+                Assign Medicine
+            </button>
 
-        <button onclick="loadSupplierMedicines(${supplier.supplier_id})">
-            View Medicines
-        </button>
+            <button onclick="loadSupplierMedicines(${supplier.supplier_id})">
+                View Medicines
+            </button>
 
-        <button onclick="loadSupplierOrders(${supplier.supplier_id})">
-            View Orders
-        </button>
+            <button onclick="loadSupplierOrders(${supplier.supplier_id})">
+                View Orders
+            </button>
+        </div>
 
-        <div id="assignMedicineForm" style="margin-top:10px;"></div>
+        <div id="assignMedicineForm" style="margin-top:15px;"></div>
     `;
 }
 
-let currentSupplierId = null;
-let currentSupplierData = null; // ⭐ store supplier
+// ======================
+// VIEW SUPPLIER
+// ======================
 window.viewSupplier = async function(id){
 
     const details = document.getElementById("supplierDetails");
@@ -192,329 +179,202 @@ window.viewSupplier = async function(id){
         return;
     }
 
-    try {
+    const res = await fetch(`/api/suppliers/${id}`,{ credentials:"include" });
+    const result = await res.json();
+    const supplier = result.data || result.supplier;
 
-        const res = await fetch(`/api/suppliers/${id}`,{
-            credentials:"include"
-        });
+    currentSupplierId = id;
+    currentSupplierData = supplier;
 
-        const result = await res.json();
-        const supplier = result.data || result.supplier;
-
-        if(!supplier){
-            details.innerHTML = "<p>Supplier not found</p>";
-            return;
-        }
-
-        currentSupplierId = id;
-        currentSupplierData = supplier; // ⭐ store data
-
-        renderSupplierDetails(supplier);
-
-    } catch(err){
-        console.error(err);
-    }
+    renderSupplierDetails(supplier);
 };
-window.goBackToSupplierDetails = function(){
 
+// ======================
+// BACK FUNCTION (FIXED)
+// ======================
+window.goBackToSupplierDetails = function(){
     if(!currentSupplierData) return;
+    renderSupplierDetails(currentSupplierData);
+};
+
+// ======================
+// VIEW MEDICINES
+// ======================
+window.loadSupplierMedicines = async function(id){
 
     const details = document.getElementById("supplierDetails");
 
-    details.dataset.view = ""; // reset view
-    renderSupplierDetails(currentSupplierData); // ⭐ reuse data
-};
+    const res = await fetch(`/api/suppliers/${id}/medicines`, {
+        credentials: "include"
+    });
 
-// ======================
-// Assign Medicine UI
-// ======================
-window.showAssignMedicineForm = function(supplierId){
+    const result = await res.json();
+    const medicines = result.data || result.medicines || [];
 
-    const formDiv = document.getElementById("assignMedicineForm");
+    let html = `
+        <button onclick="goBackToSupplierDetails()">⬅ Back</button>
+        <h3>Medicines Supplied</h3>
 
-    formDiv.innerHTML = `
-        <h4>Assign Medicine</h4>
-
-        <input type="text" id="medicine_name" placeholder="Search Medicine" />
-
-        <input type="number" id="price" placeholder="Purchase Price" />
-
-        <input type="number" id="lead_time_days" placeholder="Lead Time (days)" value="3" />
-
-        <label>
-            <input type="checkbox" id="is_primary" />
-            Primary Supplier
-        </label>
-
-        <button onclick="assignMedicine(${supplierId})">Assign</button>
-
-        <div id="medicineSearchResults"></div>
+        <table>
+            <tr>
+                <th>Name</th>
+                <th>Generic</th>
+                <th>Price</th>
+                <th>Lead Time</th>
+                <th>Primary</th>
+            </tr>
     `;
-};
 
-// ======================
-// Assign Medicine API
-// ======================
-
-
-document.addEventListener("input", async function(e){
-
-    if(e.target.id === "medicine_name"){
-
-        const input = e.target;
-
-        // ✅ IMPORTANT FIX: reset ID when user types
-        input.dataset.id = "";
-
-        const term = input.value;
-
-        if(term.length < 2) return;
-
-        const res = await fetch(`/api/medicines/search?term=${term}`, {
-            credentials: "include"
-        });
-
-        const result = await res.json();
-        const medicines = result.data || [];
-
-        const resultDiv = document.getElementById("medicineSearchResults");
-
-        resultDiv.innerHTML = "";
-
-        medicines.forEach(m => {
-
-            const item = document.createElement("p");
-
-            item.textContent = m.name + " (" + m.generic_name + ")";
-            item.style.cursor = "pointer";
-
-            item.onclick = () => {
-                input.value = m.name;
-
-                // ✅ SET ID ONLY WHEN USER CLICKS
-                input.dataset.id = m.medicine_id;
-
-                resultDiv.innerHTML = "";
-            };
-
-            resultDiv.appendChild(item);
-
-        });
-
+    if(!medicines.length){
+        html += `<tr><td colspan="5">No medicines assigned</td></tr>`;
     }
 
-});
+    medicines.forEach(m => {
+        html += `
+            <tr>
+                <td>${m.name}</td>
+                <td>${m.generic_name || "-"}</td>
+                <td>${m.last_purchase_price || "-"}</td>
+                <td>${m.lead_time_days || 3}</td>
+                <td>${m.is_primary ? "Yes" : "No"}</td>
+            </tr>
+        `;
+    });
 
+    html += `</table>`;
+    details.innerHTML = html;
+};
+
+// ======================
+// VIEW ORDERS
+// ======================
+window.loadSupplierOrders = async function(id){
+
+    const details = document.getElementById("supplierDetails");
+
+    const res = await fetch(`/api/suppliers/${id}/orders`, {
+        credentials: "include"
+    });
+
+    const result = await res.json();
+    const orders = result.data || result.orders || [];
+
+    let html = `
+        <button onclick="goBackToSupplierDetails()">⬅ Back</button>
+        <h3>Supplier Orders</h3>
+
+        <table>
+            <tr>
+                <th>Order ID</th>
+                <th>Status</th>
+                <th>Date</th>
+            </tr>
+    `;
+
+    if(!orders.length){
+        html += `<tr><td colspan="3">No orders found</td></tr>`;
+    }
+
+    orders.forEach(o => {
+        html += `
+            <tr>
+                <td>${o.po_id}</td>
+                <td>${o.status || "-"}</td>
+                <td>${o.order_date ? new Date(o.order_date).toLocaleDateString("en-IN") : "-"}</td>
+            </tr>
+        `;
+    });
+
+    html += `</table>`;
+    details.innerHTML = html;
+};
+
+// ======================
+// ASSIGN MEDICINE FORM
+// ======================
 window.toggleAssignMedicineForm = function(supplierId){
 
     const formDiv = document.getElementById("assignMedicineForm");
 
-    // 👉 Toggle
     if(formDiv.innerHTML.trim() !== ""){
         formDiv.innerHTML = "";
         return;
     }
 
     formDiv.innerHTML = `
-        <h4>Assign Medicine</h4>
+        <div class="assign-card">
 
-        <input type="text" id="medicine_name" placeholder="Search Medicine" />
+            <h4>💊 Assign Medicine</h4>
 
-        <input type="number" id="price" placeholder="Purchase Price" />
+            <div class="form-group">
+                <label>Medicine Name</label>
+                <input type="text" id="medicine_name">
+            </div>
 
-        <input type="number" id="lead_time_days" placeholder="Lead Time (days)" value="3" />
+            <div class="form-group">
+                <label>Price</label>
+                <input type="number" id="price">
+            </div>
 
-        <label>
-            <input type="checkbox" id="is_primary" />
-            Primary Supplier
-        </label>
+            <div class="form-group">
+                <label>Lead Time</label>
+                <input type="number" id="lead_time_days" value="3">
+            </div>
 
-        <button onclick="assignMedicine(${supplierId})">Assign</button>
+            <label>
+                <input type="checkbox" id="is_primary"> Primary
+            </label>
 
-        <div id="medicineSearchResults"></div>
+            <button class="btn-assign" onclick="assignMedicine(${supplierId})">
+                Assign
+            </button>
+        </div>
     `;
 };
-// ======================
-// Supplier Medicines (TABLE)
-// ======================
-window.loadSupplierMedicines = async function(id){
 
-    const details = document.getElementById("supplierDetails");
+// ======================
+// ASSIGN MEDICINE API
+// ======================
+window.assignMedicine = async function(supplierId){
 
-    // Toggle OFF
-    if(details.dataset.view === "medicines"){
-        details.innerHTML = "";
-        details.style.display = "none";
-        details.dataset.view = "";
+    const medicineName = document.getElementById("medicine_name").value.trim();
+    const price = document.getElementById("price").value;
+    const leadTime = document.getElementById("lead_time_days").value;
+    const isPrimary = document.getElementById("is_primary").checked;
+
+    if(!medicineName){
+        alert("Enter medicine name");
         return;
     }
 
-    details.dataset.view = "medicines";
-    details.style.display = "block";
+    const res = await fetch(`/api/suppliers/${supplierId}/medicines`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({
+            medicine_name: medicineName,
+            last_purchase_price: price ? Number(price) : null,
+            lead_time_days: leadTime ? Number(leadTime) : 3,
+            is_primary: isPrimary
+        })
+    });
 
-    try {
-        const res = await fetch(`/api/suppliers/${id}/medicines`,{
-            credentials:"include"
-        });
+    const result = await res.json();
 
-        const result = await res.json();
-        const medicines = result.data || result.medicines || [];
-
-        let html = `
-            <button onclick="goBackToSupplierDetails()">⬅ Back</button>
-            <h3>Medicines Supplied</h3>
-            <table border="1">
-                <tr>
-                    <th>Name</th>
-                    <th>Generic</th>
-                    <th>Price</th>
-                    <th>Lead Time</th>
-                    <th>Primary</th>
-                </tr>
-        `;
-
-        if(!medicines.length){
-            html += `<tr><td colspan="5">No medicines assigned</td></tr>`;
-        }
-
-        medicines.forEach(m => {
-            html += `
-                <tr>
-                    <td>${m.name}</td>
-                    <td>${m.generic_name || "-"}</td>
-                    <td>${m.last_purchase_price || "-"}</td>
-                    <td>${m.lead_time_days || 3}</td>
-                    <td>${m.is_primary ? "Yes" : "No"}</td>
-                </tr>
-            `;
-        });
-
-        html += `</table>`;
-
-        details.innerHTML = html;
-
-    } catch(err){
-        console.error(err);
-    }
-};
-// ======================
-// Supplier Orders (TABLE)
-// ======================
-window.loadSupplierOrders = async function(id){
-
-    const details = document.getElementById("supplierDetails");
-
-    // Toggle OFF
-    if(details.dataset.view === "orders"){
-        details.innerHTML = "";
-        details.style.display = "none";
-        details.dataset.view = "";
+    if(!res.ok){
+        alert(result.message);
         return;
     }
 
-    details.dataset.view = "orders";
-    details.style.display = "block";
+    alert("Medicine assigned");
 
-    try {
-
-        const res = await fetch(`/api/suppliers/${id}/orders`,{
-            credentials:"include"
-        });
-
-        const result = await res.json();
-        const orders = result.data || result.orders || [];
-
-        let html = `
-            <button onclick="goBackToSupplierDetails()">⬅ Back</button>
-            <h3>Supplier Orders</h3>
-            <table border="1">
-                <tr>
-                    <th>Order ID</th>
-                    <th>Status</th>
-                    <th>Date</th>
-                </tr>
-        `;
-
-        if(!orders.length){
-            html += `<tr><td colspan="3">No orders found</td></tr>`;
-        }
-
-        orders.forEach(o => {
-            html += `
-                <tr>
-                    <td>${o.po_id}</td>
-                    <td>${o.status || "-"}</td>
-                    <td>${o.order_date 
-                        ? new Date(o.order_date).toLocaleDateString("en-IN") 
-                        : "-"}</td>
-                </tr>
-            `;
-        });
-
-        html += `</table>`;
-
-        details.innerHTML = html;
-
-    } catch(err){
-        console.error(err);
-    }
+    document.getElementById("medicine_name").value = "";
+    document.getElementById("price").value = "";
+    document.getElementById("lead_time_days").value = 3;
+    document.getElementById("is_primary").checked = false;
 };
 
 // ======================
 loadSuppliers();
 
 });
-window.assignMedicine = async function(supplierId){
-
-    const medicineInput = document.getElementById("medicine_name");
-
-    // 🔥 NOW we take value directly as ID
-    const medicineId = medicineInput.value;
-
-    const price = document.getElementById("price").value;
-    const leadTime = document.getElementById("lead_time_days").value;
-    const isPrimary = document.getElementById("is_primary").checked;
-
-    // ❗ VALIDATION
-    if(!medicineId || isNaN(medicineId)){
-        alert("Please enter a valid Medicine ID");
-        return;
-    }
-
-    try {
-
-        const res = await fetch(`/api/suppliers/${supplierId}/medicines`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            credentials: "include",
-            body: JSON.stringify({
-
-                medicine_id: Number(medicineId),
-                last_purchase_price: price ? Number(price) : null,
-                lead_time_days: leadTime ? Number(leadTime) : 3,
-                is_primary: isPrimary
-
-            })
-        });
-
-        const result = await res.json();
-
-        if(!res.ok){
-            alert(result.message || "Failed to assign medicine");
-            return;
-        }
-
-        alert("Medicine assigned successfully");
-
-        // clear form
-        medicineInput.value = "";
-        document.getElementById("price").value = "";
-        document.getElementById("lead_time_days").value = 3;
-        document.getElementById("is_primary").checked = false;
-
-    } catch(err){
-        console.error("Assign medicine error:", err);
-    }
-};

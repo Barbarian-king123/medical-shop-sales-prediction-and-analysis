@@ -54,7 +54,7 @@ function renderAnalysisChart(forecast) {
 
   layout: {
     padding: {
-      top: 40,   // 🔥 THIS pushes chart downward
+      top: 40,   
       bottom: 10
     }
   },

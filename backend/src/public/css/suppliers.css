@@ -293,3 +293,40 @@ tbody button:last-child:hover{
 #supplierDetails {
     display: none;
 }
+
+/* Improve input look */
+.assign-card input {
+    font-size: 14px;
+}
+
+/* Better spacing */
+.assign-card {
+    margin-top: 20px;
+}
+
+/* Button click effect */
+.btn-assign:active {
+    transform: scale(0.97);
+}
+
+/* Smooth hover for rows */
+table tbody tr {
+    transition: 0.2s;
+}
+
+/* Supplier detail spacing */
+#supplierDetails p {
+    margin: 5px 0;
+}
+
+/* Fix button spacing */
+#supplierDetails button {
+    margin-bottom: 8px;
+}
+
+/* Make form responsive */
+@media (max-width: 600px) {
+    .assign-card {
+        max-width: 100%;
+    }
+}

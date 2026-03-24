@@ -25,7 +25,7 @@
                 <input type="text" id="searchInput" placeholder="Search medicines...">
             </div>
 
-            <% if (user.role === "Owner") { %>
+            <% if (user.role !== "Staff") { %>
                 <button id="addMedicineBtn" class="primary-btn">
                     + Add Medicine
                 </button>

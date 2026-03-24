@@ -1,17 +1,19 @@
-function filterOrders(status) {
+// ================= FILTER =================
+function filterOrders(status, element) {
 
-  // 👉 Load orders
   loadOrders(status);
 
-  // 👉 Remove active from all buttons
+  // Remove active from all buttons
   document.querySelectorAll(".filter-btn").forEach(btn => {
     btn.classList.remove("active");
   });
 
-  // 👉 Add active to clicked button
-  event.target.classList.add("active");
+  // Add active to clicked button
+  element.classList.add("active");
 }
 
+
+// ================= LOAD ORDERS =================
 async function loadOrders(status = "") {
 
   let url = "/api/orders";
@@ -42,9 +44,7 @@ async function loadOrders(status = "") {
         </button>
       `;
 
-    }
-
-    else if (order.status === "Partially Delivered") {
+    } else if (order.status === "Partially Delivered") {
 
       actions = `
         <button onclick="showReceiveForm(${order.po_id})">
@@ -52,54 +52,48 @@ async function loadOrders(status = "") {
         </button>
       `;
 
-    }
-
-    else {
+    } else {
 
       actions = `<span>No Actions</span>`;
-
     }
 
     const row = document.createElement("tr");
 
     row.innerHTML = `
-  <td>${order.po_id}</td>
-  <td>${order.supplier_name}</td>
-  <td>${order.medicines || "—"}</td>
-  <td>${new Date(order.order_date).toLocaleDateString()}</td>
-  <td>${order.status}</td>
-  <td>${actions}</td>
-`;
+      <td>${order.po_id}</td>
+      <td>${order.supplier_name}</td>
+      <td>${order.medicines || "—"}</td>
+      <td>${new Date(order.order_date).toLocaleDateString()}</td>
+      <td>${order.status}</td>
+      <td>${actions}</td>
+    `;
 
     table.appendChild(row);
-
   });
-
 }
 
 
+// ================= RECEIVE FORM =================
 let currentOrderId = null;
+
 function showReceiveForm(orderId) {
 
   const container = document.getElementById("orderDetails");
 
-  // 👉 If same order clicked → hide
-  if (currentOrderId === orderId) {
-    container.innerHTML = "";
-    container.style.display = "none"; // hide container
-    currentOrderId = null;
-    return;
-  }
-
-  // 👉 Show container
   container.style.display = "block";
   currentOrderId = orderId;
 
   container.innerHTML = `
-    <h3>Receive Order #${orderId}</h3>
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <h3>Receive Order #${orderId}</h3>
+      <button onclick="closeReceiveForm()" 
+              style="background:red; color:white; border:none; padding:5px 10px; cursor:pointer;">
+        ✖
+      </button>
+    </div>
 
-    <label>Medicine ID</label>
-    <input id="medicine_id"><br><br>
+    <label>Medicine Name</label>
+    <input id="medicine_name" placeholder="e.g. Paracetamol"><br><br>
 
     <label>Batch Number</label>
     <input id="batch_number"><br><br>
@@ -126,12 +120,14 @@ function showReceiveForm(orderId) {
 }
 
 
-
+// ================= RECEIVE ORDER =================
 async function receiveOrder(orderId) {
 
   const batch = {
 
-    medicine_id: document.getElementById("medicine_id").value,
+    // 🔥 CHANGED: name instead of ID
+    medicine_name: document.getElementById("medicine_name").value.trim(),
+
     batch_number: document.getElementById("batch_number").value,
     mfg_date: document.getElementById("mfg_date").value,
     expiry_date: document.getElementById("expiry_date").value,
@@ -141,20 +137,21 @@ async function receiveOrder(orderId) {
 
   };
 
+  // Basic validation (frontend)
+  if (!batch.medicine_name) {
+    alert("Medicine name required");
+    return;
+  }
+
   const res = await fetch(`/api/orders/${orderId}/receive`, {
-
     method: "POST",
-
     headers: {
       "Content-Type": "application/json"
     },
-
     credentials: "include",
-
     body: JSON.stringify({
       batches: [batch]
     })
-
   });
 
   const result = await res.json();
@@ -166,21 +163,19 @@ async function receiveOrder(orderId) {
 
   alert("Order received successfully");
 
+  closeReceiveForm();   // ✅ auto close
   loadOrders();
-
 }
 
 
-
+// ================= CANCEL ORDER =================
 async function cancelOrder(orderId) {
 
   if (!confirm("Cancel this order?")) return;
 
   const res = await fetch(`/api/orders/${orderId}/cancel`, {
-
     method: "POST",
     credentials: "include"
-
   });
 
   const result = await res.json();
@@ -193,9 +188,17 @@ async function cancelOrder(orderId) {
   alert("Order cancelled");
 
   loadOrders();
-
 }
 
 
+// ================= CLOSE FORM =================
+function closeReceiveForm() {
+  const container = document.getElementById("orderDetails");
+  container.innerHTML = "";
+  container.style.display = "none";
+  currentOrderId = null;
+}
 
+
+// ================= INIT =================
 loadOrders();

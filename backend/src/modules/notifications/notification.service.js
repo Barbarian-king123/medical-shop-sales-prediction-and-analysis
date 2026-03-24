@@ -52,23 +52,21 @@ exports.checkExpiryNotifications = async () => {
 
 exports.checkLowStockNotifications = async () => {
 
-    // 🔥 NEW: batch-level instead of medicine-level
-    const batches = await repo.getLowStockBatches();
+    const medicines = await repo.getMedicinesWithStock();
 
-    for (const batch of batches) {
+    for (const med of medicines) {
+        
+        
 
-        const medicine = await repo.getAllMedicines()
-            .then(meds => meds.find(m => m.medicine_id === batch.medicine_id));
-
-        if (!medicine || !medicine.atc_code) {
-            console.log("Skipping batch without ATC:", batch.batch_id);
+        if (!med.atc_code) {
+            console.log("Skipping (no ATC):", med.medicine_id);
             continue;
         }
 
-        const supplier = await repo.getPrimarySupplier(batch.medicine_id);
+        const supplier = await repo.getPrimarySupplier(med.medicine_id);
 
         if (!supplier) {
-            console.log("No supplier for batch:", batch.batch_id);
+            console.log("No supplier:", med.medicine_id);
             continue;
         }
 
@@ -78,7 +76,7 @@ exports.checkLowStockNotifications = async () => {
 
         try {
             forecastResult = await forecast(
-                medicine.atc_code,
+                med.atc_code,
                 leadTime
             );
         } catch (err) {
@@ -86,25 +84,36 @@ exports.checkLowStockNotifications = async () => {
             continue;
         }
 
-        const predictedDemand = Number(
-            forecastResult?.restock_quantity
-        ) || 0;
+        const predictedDemand =
+            Number(forecastResult?.restock_quantity) || 0;
 
-        const safetyStock = Number(medicine.safety_stock) || 20;
+        const safetyStock = Number(med.safety_stock) || 20;
 
         const reorderPoint = Math.ceil(
             predictedDemand + safetyStock
         );
 
-        if (batch.quantity < reorderPoint) {
+        const currentStock = Number(med.total_stock) || 0;
 
-            const suggestedQuantity = Math.ceil(
-                Math.max(reorderPoint - batch.quantity, 0)
+        // ✅ MAIN CONDITION
+        if (currentStock < reorderPoint) {
+            // 🔍 Check if already exists
+            const existing = await repo.getExistingLowStockNotification(
+                med.medicine_id
             );
 
+            if (existing) {
+                console.log("⚠️ Already exists, skipping:", med.name);
+                continue;
+            }
+
+            const suggestedQuantity = Math.ceil(
+                reorderPoint - currentStock
+            );
+            
+
             await repo.insertNotification({
-                medicine_id: batch.medicine_id,
-                batch_id: batch.batch_id, // 🔥 IMPORTANT
+                medicine_id: med.medicine_id,
                 supplier_id: supplier.supplier_id,
                 alert_type: "Low Stock",
                 predicted_daily_velocity: predictedDemand,
@@ -114,16 +123,10 @@ exports.checkLowStockNotifications = async () => {
                 created_at: new Date()
             });
 
-            await repo.markLowStockAlertSent(batch.batch_id);
-
-            console.log("📉 Low stock notification created:", batch.batch_id);
+            console.log("📉 Low stock (medicine-level):", med.name);
 
         } else {
-
-            // 🔁 RESET FLAG (important)
-            await repo.resetLowStockFlag(batch.batch_id);
-
-            console.log("✅ Stock OK, flag reset:", batch.batch_id);
+            console.log("✅ Stock OK:", med.name);
         }
     }
 };
