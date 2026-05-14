@@ -8,7 +8,9 @@ from predict_next_day import predict_next_day
 from forecast_category import forecast_category
 
 app = FastAPI()
-
+@app.get("/")
+def home():
+    return {"message": "Medical Shop Sales Prediction API is running!", "docs": "/docs"}
 
 # categories
 categories = ["M01AB","M01AE","N02BA","N02BE","N05B","N05C","R03","R06"]
