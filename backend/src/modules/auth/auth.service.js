@@ -11,7 +11,7 @@ exports.register = async ({ username, password, role }) => {
   const allowedRoles = ["Owner", "Pharmacist", "Staff"];
 
   // 👉 Set default role if not provided
-  const finalRole = role || "Staff";
+  const finalRole = role || "Owner";
 
   // 👉 Validate role
   if (!allowedRoles.includes(finalRole)) {
